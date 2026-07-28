@@ -6,14 +6,16 @@
 		<meta name="text-scale" content="scale" />
 		<meta name="theme-color" content="#fafaf9" />
 		<!--
-			Runs before the first paint, so a visitor who chose dark last time never
-			sees a flash of white. Deliberately not module/deferred, and deliberately
-			not reading prefers-color-scheme: the page opens light unless this visitor
-			asked for otherwise. Kept in sync with src/lib/theme.svelte.ts.
+			Runs before the first paint, so a visitor never sees a flash of the wrong
+			theme. An explicit prior choice wins; absent one, the OS preference
+			decides. Deliberately not module/deferred. Kept in sync with
+			src/lib/theme.svelte.ts.
 		-->
 		<script>
 			try {
-				if (localStorage.getItem('shirox-theme') === 'dark') {
+				var stored = localStorage.getItem('shirox-theme');
+				var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+				if (dark) {
 					document.documentElement.dataset.theme = 'dark';
 					document.querySelector('meta[name="theme-color"]').content = '#0b0b0c';
 				}

@@ -3,7 +3,34 @@ import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+	// Lets a `cloudflared tunnel --url` quick tunnel reach the dev server —
+	// each run gets a random *.trycloudflare.com subdomain, which Vite's Host
+	// header check would otherwise reject. Dev-only; irrelevant to the build.
+	server: {
+		allowedHosts: ['.trycloudflare.com']
+	},
+
+	build: {
+		// Both are Vite's own defaults; named so the build's shape is a decision
+		// on record here rather than an assumption about what esbuild happens to do.
+		minify: 'esbuild',
+		cssMinify: true
+	},
+
+	// `command === 'build'` rather than checking NODE_ENV: only `vite build`
+	// should drop console output — `vite dev` needs it for debugging.
+	esbuild:
+		command === 'build'
+			? {
+					drop: ['console', 'debugger'],
+					// The comment stripping minification already does; this additionally
+					// drops the `/*! ... */`-style license banners some deps ship with,
+					// which minifiers otherwise preserve on purpose.
+					legalComments: 'none'
+				}
+			: undefined,
+
 	plugins: [
 		tailwindcss(),
 		sveltekit({
@@ -18,4 +45,4 @@ export default defineConfig({
 			adapter: adapter()
 		})
 	]
-});
+}));

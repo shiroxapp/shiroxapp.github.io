@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { hero, links } from '$lib/content';
+	import { preconnectOnHover } from '$lib/motion';
 	import ShiroMark from './ShiroMark.svelte';
 
 	const line1 = hero.headline.split(' ');
@@ -10,7 +11,7 @@
      its own. Below sm the dock is flush to the top edge rather than floating at
      top-3, so it needs less clearing. -->
 <section class="mx-auto max-w-5xl px-6 pt-24 pb-12 sm:pt-32 md:pt-44 md:pb-16">
-	<ShiroMark draw class="load-rise h-12 w-12" />
+	<ShiroMark draw class="load-rise h-12 w-12 transition-transform duration-500 hover:-rotate-6" />
 
 	<!-- Words are split so they can rise in one after another. The `{' '}` between
 	     them is a real space text node, not a margin: without it the heading reads
@@ -50,6 +51,7 @@
 			href={links.github}
 			target="_blank"
 			rel="noreferrer"
+			use:preconnectOnHover
 			class="ul text-[0.9375rem] transition-colors hover:text-(--fg)"
 			style="color: var(--muted)">Source</a
 		>

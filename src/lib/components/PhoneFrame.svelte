@@ -9,6 +9,13 @@
 	 * `landscape` swaps the shell's two dimensions. Both are derived from `--w` on
 	 * an ancestor, so turning sideways is one transition on width and height rather
 	 * than a rotation, and the corner radius stays put through the whole move.
+	 *
+	 * Also used, unmodified, for a capture of something that isn't a phone (the
+	 * tvOS screen) — same box, same chrome, on the theory that a shape that keeps
+	 * changing size and style screen to screen would read as a broken carousel
+	 * rather than one frame showing something different for a moment. The image
+	 * fits inside without cropping or stretching; see `.screen`'s object-fit
+	 * override in Showcase.svelte.
 	 */
 	let { children, landscape = false }: { children: Snippet; landscape?: boolean } = $props();
 </script>

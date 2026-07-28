@@ -294,3 +294,43 @@ export function scrollProgress(node: HTMLElement) {
 		}
 	};
 }
+
+/** Origins already given a `<link rel="preconnect">` — shared across every
+    element using the action below, so hovering a second link to the same
+    place is a no-op instead of a duplicate tag. */
+const preconnected = new Set<string>();
+
+/**
+ * Opens the connection to an external link's destination as soon as the
+ * pointer arrives, rather than waiting for the click — a link is far more
+ * often hovered before it's clicked than clicked without ever being
+ * hovered, so the DNS lookup, TLS handshake and (for AltStore's own source
+ * URL) TCP connection are already underway by the time the visitor commits.
+ *
+ * Silently does nothing for anything that isn't a real `http`/`https` URL —
+ * `altstore://` and `sidestore://` deep links have no connection to open.
+ */
+export function preconnectOnHover(node: HTMLAnchorElement) {
+	const enter = () => {
+		let origin: string;
+		try {
+			origin = new URL(node.href).origin;
+		} catch {
+			return;
+		}
+		if (!origin.startsWith('http') || preconnected.has(origin)) return;
+		preconnected.add(origin);
+
+		const link = document.createElement('link');
+		link.rel = 'preconnect';
+		link.href = origin;
+		document.head.appendChild(link);
+	};
+
+	node.addEventListener('pointerenter', enter);
+	return {
+		destroy() {
+			node.removeEventListener('pointerenter', enter);
+		}
+	};
+}

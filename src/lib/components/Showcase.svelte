@@ -2,6 +2,12 @@
 	import { hoverPause, inView, onScreen, swipe, tilt } from '$lib/motion';
 	import { screens } from '$lib/content';
 	import PhoneFrame from './PhoneFrame.svelte';
+	import { theme } from '$lib/theme.svelte';
+
+	/** Screens with no light capture of their own (the player, tvOS) just keep `src`. */
+	function displaySrc(screen: (typeof screens)[number]) {
+		return theme.current === 'light' && screen.srcLight ? screen.srcLight : screen.src;
+	}
 
 	let active = $state(0);
 	/** Tracked per region rather than on the section as a whole: the wrapper spans
@@ -32,7 +38,19 @@
 	/** Held still while the device, its labels or its caption are hovered, while a
 	    label is focused, or while the whole thing is scrolled past. */
 	const held = $derived(overDevice || overTabs || overCaption || focused || !visible);
-	const landscape = $derived(Boolean(screens[active].landscape) && wide);
+	/** The tvOS capture drops out below the width a device can turn sideways in
+	    — fitted rather than cropped (`.screen.contain`) still reads as an odd
+	    fit once it's portrait, and there's no phone-shaped alternative capture
+	    to fall back to, unlike `narrowSrc`. */
+	const visibleScreens = $derived(wide ? screens : screens.filter((s) => !s.bare));
+	const bare = $derived(Boolean(visibleScreens[active]?.bare));
+	const landscape = $derived(Boolean(visibleScreens[active]?.landscape) && wide);
+
+	/** The list just lost the screen `active` pointed at (tvOS, narrowing away) —
+	    back to the first rather than off the end. */
+	$effect(() => {
+		if (active >= visibleScreens.length) active = 0;
+	});
 
 	$effect(() => {
 		reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -71,7 +89,8 @@
 	});
 
 	function wrap(i: number) {
-		return ((i % screens.length) + screens.length) % screens.length;
+		const n = visibleScreens.length;
+		return ((i % n) + n) % n;
 	}
 
 	function go(next: number, manual = false) {
@@ -84,7 +103,7 @@
 			ArrowRight: active + 1,
 			ArrowLeft: active - 1,
 			Home: 0,
-			End: screens.length - 1
+			End: visibleScreens.length - 1
 		};
 
 		const next = moves[event.key];
@@ -125,7 +144,7 @@
 								aria-labelledby="tab-{active}"
 								class="absolute inset-0"
 							>
-								{#each screens as screen, i (screen.label)}
+								{#each visibleScreens as screen, i (screen.label)}
 									<!-- The browser picks the orientation itself, so a phone never
 									     downloads the sideways capture just to discard it. -->
 									<picture>
@@ -133,13 +152,14 @@
 											<source media="(max-width: 43.999rem)" srcset={screen.narrowSrc} />
 										{/if}
 										<img
-											src={screen.src}
+											src={displaySrc(screen)}
 											alt={screen.alt}
 											aria-hidden={active !== i}
 											loading={i === 0 ? 'eager' : 'lazy'}
 											decoding="async"
 											draggable="false"
 											class="screen"
+											class:contain={screen.bare}
 											style="opacity: {active === i ? 1 : 0}; transform: scale({active === i
 												? 1
 												: 1.015});"
@@ -163,7 +183,7 @@
 			class="no-scrollbar mt-8 flex max-w-full gap-1 overflow-x-auto"
 			class:faded={scrollable}
 		>
-			{#each screens as screen, i (screen.label)}
+			{#each visibleScreens as screen, i (screen.label)}
 				<button
 					bind:this={tabs[i]}
 					type="button"
@@ -199,7 +219,7 @@
 		<div class="mt-5" use:hoverPause={(over) => (overCaption = over)}>
 			{#key active}
 				<p class="load-rise text-center text-[0.9375rem]" style="color: var(--muted);">
-					{screens[active].caption}
+					{visibleScreens[active]?.caption}
 				</p>
 			{/key}
 		</div>
@@ -249,6 +269,13 @@
 		transition:
 			opacity 0.7s var(--ease),
 			transform 0.7s var(--ease);
+	}
+
+	/* The tvOS capture isn't the frame's own aspect, so cropping it to fill —
+	   what every other screen wants, since each is a real device capture at the
+	   frame's own ratio — would cut its edges instead. Letterboxed, not cropped. */
+	.screen.contain {
+		object-fit: contain;
 	}
 
 	.tab {
