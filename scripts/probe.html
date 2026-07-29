@@ -64,6 +64,14 @@ async function run() {
 		(v) => v.includes('opacity') && v.includes('transform'));
 	check('heading words are staggered apart', doc.querySelectorAll('#features-heading span').length, (v) => Number(v) > 1);
 
+	/* The device is on the first screen at every viewport, so its entrance is a load
+	   animation, not a scroll one. Asserting the animation rather than a class is
+	   deliberate: an element already past the observer's trigger line gains `in` in the
+	   same frame as `rise` and paints neither state, so a class check would pass while
+	   nothing whatsoever moved. */
+	check('the device arrives with a load animation', getComputedStyle(doc.querySelector('.device')).animationName, 'rise-in');
+	check('the device is not scroll-armed as well', doc.querySelector('.device').classList.contains('rise'), 'false');
+
 	check('idle drift survives on its own element', getComputedStyle(doc.querySelector('.float')).animationName, 'float');
 	check('drift and entrance are not the same element', doc.querySelectorAll('.device.float').length, '0');
 
