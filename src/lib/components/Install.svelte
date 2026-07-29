@@ -22,8 +22,8 @@
 
 	<p
 		use:inView={70}
-		class="reveal mt-5 max-w-[38ch] text-[1.0625rem]"
-		style="--i: 1; color: var(--muted); text-wrap: pretty;"
+		class="mt-5 max-w-[38ch] text-[1.0625rem]"
+		style="color: var(--muted); text-wrap: pretty;"
 	>
 		{sections.install.sub}
 	</p>
@@ -37,8 +37,7 @@
 	>
 		{#if recommended}
 			<article
-				class="card lead glow reveal surface relative overflow-hidden rounded-2xl p-7 md:col-span-2 md:p-10"
-				style="--i: 0"
+				class="card lead glow relative overflow-hidden rounded-2xl p-7 md:col-span-2 md:p-10"
 			>
 				<span class="edge" aria-hidden="true"></span>
 
@@ -71,10 +70,9 @@
 			</article>
 		{/if}
 
-		{#each rest as method, i (method.title)}
+		{#each rest as method (method.title)}
 			<article
-				class="card glow reveal surface relative flex flex-col overflow-hidden rounded-2xl p-7 md:p-8"
-				style="--i: {i + 1}"
+				class="card glow relative flex flex-col overflow-hidden rounded-2xl p-7 md:p-8"
 			>
 				<h3 class="text-[1.25rem] font-medium tracking-tight md:text-[1.375rem]">
 					{method.title}

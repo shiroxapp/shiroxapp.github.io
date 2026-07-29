@@ -105,7 +105,7 @@
 			<!-- The entrance and the idle drift get an element each. Both want the
 			     `animation` property, and on one element the more specific rule would
 			     replace the other outright rather than adding to it. -->
-			<div use:inView class="reveal media" style="perspective: 1400px;">
+			<div use:inView class="device" style="perspective: 1400px;">
 				<div class="float">
 					<!-- Wraps the frame exactly, so the pause covers the device and nothing
 					     of the stage's centring space around it. -->

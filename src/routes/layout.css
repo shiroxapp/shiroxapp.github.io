@@ -241,9 +241,10 @@ button:disabled,
 
 /* ── Motion ──────────────────────────────────────────────────────────────────
    Two mechanisms, one easing:
-   `.load-*` animate once on page load via animation-delay.
-   `.rise` waits for the `in` class, added by the inView action on scroll.
-   Both stagger off --i (index) so a parent can sequence its children.        */
+   `.load-*` animate once on page load, staggering off --i (index) so a parent can
+   sequence its children.
+   `.rise` waits for the `in` class, added by the inView action on scroll, and
+   staggers off --delay, which the action writes per element as each batch arrives. */
 
 @keyframes rise-in {
 	from {
@@ -313,74 +314,6 @@ button:disabled,
 .rise.in {
 	opacity: 1;
 	transform: none;
-}
-
-/* ── Scroll-linked entrances ─────────────────────────────────────────────────
-   The reveal above is a clip: something trips it and it plays for 0.75s regardless
-   of what the visitor does next. These rules make the same entrance a function of
-   where the element is on screen, so it tracks the scroll and runs backward when
-   the visitor scrolls up. That is the whole of the difference between motion that
-   reads as canned and motion that reads as physical.
-
-   Which also makes the stagger a distance rather than a delay: `--i` offsets where
-   in the element's travel the entrance begins, so a row cascades on the way in and
-   un-cascades on the way back up. Nothing here is time-based, so nothing here needs
-   `--delay`.
-
-   No `animation` shorthand anywhere below. The shorthand resets `animation-timeline`
-   to `auto`, which turns a scroll-linked entrance into a zero-duration time-based one
-   that has finished before it is ever seen — the same class of silent replacement
-   that the `transition` shorthand performs on `.rise`.
-
-   With no JavaScript at all, a browser that understands `view()` still runs this. The
-   observer path above is what browsers that do not understand it fall back to. */
-@supports (animation-timeline: view()) {
-	@media (prefers-reduced-motion: no-preference) {
-		.reveal {
-			--enter-offset: calc(var(--i, 0) * 4%);
-			animation-name: reveal-type;
-			animation-fill-mode: both;
-			animation-timing-function: linear;
-			animation-duration: auto;
-			animation-timeline: view();
-			animation-range: entry calc(15% + var(--enter-offset)) cover
-				calc(40% + var(--enter-offset));
-		}
-
-		/* Cards and panels carry a little scale, which gives them mass. Type does not:
-		   a glyph scaling through a fractional size is a blurred glyph. */
-		.reveal.surface {
-			animation-name: reveal-surface;
-		}
-
-		/* The device resolves later than the words around it, rather than in lockstep
-		   with them — the page should not arrive all at once. */
-		.reveal.media {
-			animation-range: entry 20% cover 55%;
-		}
-	}
-}
-
-@keyframes reveal-type {
-	from {
-		opacity: 0;
-		transform: translateY(1.5rem);
-	}
-	to {
-		opacity: 1;
-		transform: none;
-	}
-}
-
-@keyframes reveal-surface {
-	from {
-		opacity: 0;
-		transform: translateY(1.5rem) scale(0.985);
-	}
-	to {
-		opacity: 1;
-		transform: none;
-	}
 }
 
 /* Slow idle drift, so the device never sits perfectly still.

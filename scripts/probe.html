@@ -36,55 +36,36 @@ const shown = (frame, selector) => {
 };
 
 async function run() {
-	check('browser supports view() timelines', CSS.supports('animation-timeline', 'view()'), 'true');
+	const { doc, win } = await load('/index.html');
 
-	const { doc } = await load('/index.html');
-	const word = doc.querySelector('#features-heading span');
-	const wordStyle = getComputedStyle(word);
+	/* One entrance mechanism, so there is one thing to assert: the observer hides
+	   what is still below the fold and the CSS transitions it in. The scroll-linked
+	   `view()` path these checks used to cover was removed — it ran on only some of
+	   this site's browsers, so the entrance was a different gesture depending on who
+	   was looking. */
+	check('nothing scroll-linked survives', getComputedStyle(doc.querySelector('#features .glow-field > article')).animationName, 'none');
+	check('the observer hides what is below the fold', doc.querySelectorAll('.rise').length, (v) => Number(v) > 0);
 
-	check('heading word is scroll-linked', wordStyle.animationTimeline, (v) => v !== 'auto' && v !== '');
-	check('heading word uses the type gesture', wordStyle.animationName, 'reveal-type');
-	check('heading word range is authored', wordStyle.animationRange, (v) => v.includes('entry') && v.includes('cover'));
-	check('cascade offset differs per word', getComputedStyle(doc.querySelectorAll('#features-heading span')[2]).animationRangeStart,
-		(v) => v !== wordStyle.animationRangeStart);
-	check('no JS-applied hidden state on the enhanced path', doc.querySelectorAll('.rise').length, '0');
-
-	const fb = await load('/index.html?nolinked');
-	check('fallback still applies rise', fb.doc.querySelectorAll('.rise').length, (v) => Number(v) > 0);
-
-	// Regression guard for the hydration flash fixed on 2026-07-26: the observer path
-	// must leave anything already painted on the first screen alone, rather than
-	// hiding it and fading it back in.
-	const firstScreen = [...fb.doc.querySelectorAll('.rise')].filter((el) => {
+	// Regression guard for the hydration flash fixed on 2026-07-26: the observer must
+	// leave anything already painted on the first screen alone, rather than hiding it
+	// and fading it back in.
+	const firstScreen = [...doc.querySelectorAll('.rise')].filter((el) => {
 		const r = el.getBoundingClientRect();
-		return r.top < fb.win.innerHeight && r.bottom > 0;
+		return r.top < win.innerHeight && r.bottom > 0;
 	});
-	check('fallback hides nothing already on screen', firstScreen.length, '0');
+	check('nothing already on screen is hidden at load', firstScreen.length, '0');
 
 	const cards = doc.querySelectorAll('#features .glow-field > article');
-	check('card uses the surface gesture', getComputedStyle(cards[0]).animationName, 'reveal-surface');
-	check('card cascade offsets differ', getComputedStyle(cards[2]).animationRangeStart,
-		(v) => v !== getComputedStyle(cards[0]).animationRangeStart);
-	check('install lead panel is a surface', getComputedStyle(doc.querySelector('#install .lead')).animationName, 'reveal-surface');
-
-	// The hover response must still compose with the entrance rather than replace it.
+	// The hover response must still compose with the entrance rather than replace it,
+	// and the entrance's own properties have to survive the component's scoped list.
 	check('card hover still transitions translate', getComputedStyle(cards[0]).transitionProperty,
 		(v) => v.includes('translate') && v.includes('scale'));
-	// And the observer path must keep the opacity/transform it needs.
-	check('fallback card still transitions opacity', getComputedStyle(fb.doc.querySelector('#features .glow-field > article')).transitionProperty,
+	check('card still transitions the entrance', getComputedStyle(cards[0]).transitionProperty,
 		(v) => v.includes('opacity') && v.includes('transform'));
+	check('heading words are staggered apart', doc.querySelectorAll('#features-heading span').length, (v) => Number(v) > 1);
 
-	const device = doc.querySelector('.reveal.media');
-	check('device is scroll-linked', device && getComputedStyle(device).animationTimeline, (v) => v && v !== 'auto');
-	check('device resolves later than type', device && getComputedStyle(device).animationRange, (v) => String(v).includes('20%'));
 	check('idle drift survives on its own element', getComputedStyle(doc.querySelector('.float')).animationName, 'float');
-	check('drift and entrance are not the same element', doc.querySelectorAll('.reveal.media.float').length, '0');
-
-	const sub = doc.querySelector('#features > p');
-	check('features sub-paragraph reveals', getComputedStyle(sub).animationName, 'reveal-type');
-	check('sub-paragraph trails its heading', getComputedStyle(sub).animationRangeStart,
-		(v) => v !== getComputedStyle(doc.querySelector('#features-heading span')).animationRangeStart);
-	check('install sub-paragraph reveals', getComputedStyle(doc.querySelector('#install > p')).animationName, 'reveal-type');
+	check('drift and entrance are not the same element', doc.querySelectorAll('.device.float').length, '0');
 
 	const narrow = await load('/index.html', 390, 844);
 	const bar = narrow.doc.querySelector('header > div');

@@ -21,7 +21,5 @@
 	to copy-paste, and to crawlers.
 -->
 <h2 {id} class={klass} use:inViewStagger={45}>
-	{#each words as word, i (i)}<span class="reveal inline-block" style="--i: {i}"
-		>{word}</span
-	>{' '}{/each}
+	{#each words as word, i (i)}<span class="inline-block">{word}</span>{' '}{/each}
 </h2>
