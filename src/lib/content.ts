@@ -45,18 +45,18 @@ export type DeepLink = { label: string; href: string };
 
 export type InstallMethod = {
 	n: string;
-	kind: 'source' | 'download' | 'pending';
+	/** `join` gets the same action-link treatment as `download`, just with a
+	    plus in place of the download arrow — this isn't a file landing on
+	    disk, it's an invite to a beta. */
+	kind: 'source' | 'download' | 'join' | 'pending';
 	title: string;
 	tagline: string;
 	/** Absent for a `pending` method: there is nowhere to send anyone yet. */
 	url?: string;
 	action?: string;
 	meta?: string;
-	/** Shown instead of the action link on a `pending` method, e.g. "In review by Apple". */
+	/** Shown in place of the action link on a `pending` method, e.g. "Planned". */
 	status?: string;
-	/** ISO date the method entered its `status`. Hovering its pill counts the
-	    days since, in place of `status` — see DayCounterPill.svelte. */
-	since?: string;
 	deepLinks?: DeepLink[];
 	/** Lifts one method out of the list and into a panel. Exactly one should set it. */
 	recommended?: boolean;
@@ -192,15 +192,35 @@ export const screens: Screen[] = safeMode
 
 /** Mirrored in scripts/sync-release.ts, which reads the same manifest at build time. */
 const SOURCE_URL = 'https://raw.githubusercontent.com/xibrox/Shirox/refs/heads/main/apps.json';
+const TESTFLIGHT_URL = 'https://testflight.apple.com/join/jvGzcXYh';
+const NIGHTLY_URL = 'https://nightly.link/xibrox/Shirox/workflows/nightly.yaml/main?preview';
 
 export const installMethods: InstallMethod[] = [
 	{
 		n: '01',
+		kind: 'join',
+		title: 'TestFlight',
+		tagline: 'Public beta, straight from Apple.',
+		url: TESTFLIGHT_URL,
+		recommended: true,
+		action: 'Join the beta',
+		meta: '~21 MB · iOS 15+',
+		icon: '/icons/testflight.jpg'
+	},
+	{
+		n: '02',
+		kind: 'pending',
+		title: 'App Store',
+		tagline: 'The official listing. Release planned soon.',
+		status: 'Planned',
+		icon: '/icons/app-store.webp'
+	},
+	{
+		n: '03',
 		kind: 'source',
 		title: 'AltStore / SideStore',
 		tagline: 'Add the source once. Updates arrive on their own.',
 		url: SOURCE_URL,
-		recommended: true,
 		apps: [
 			{ name: 'AltStore', icon: '/icons/altstore.jpg' },
 			{ name: 'SideStore', icon: '/icons/sidestore.jpg' }
@@ -211,9 +231,9 @@ export const installMethods: InstallMethod[] = [
 		]
 	},
 	{
-		n: '02',
+		n: '04',
 		kind: 'download',
-		title: 'Direct IPA',
+		title: 'Stable IPA',
 		tagline: 'Sideload it by hand.',
 		url: release.ipaUrl,
 		action: 'Download',
@@ -221,29 +241,12 @@ export const installMethods: InstallMethod[] = [
 		icon: '/icons/github.jpg'
 	},
 	{
-		n: '03',
+		n: '05',
 		kind: 'download',
 		title: 'Nightly',
 		tagline: 'Latest build from main. May be unstable.',
-		url: 'https://nightly.link/xibrox/Shirox/workflows/nightly.yaml/main?preview',
-		action: 'Open',
+		url: NIGHTLY_URL,
+		action: 'Download',
 		icon: '/icons/github.jpg'
-	},
-	{
-		n: '04',
-		kind: 'pending',
-		title: 'TestFlight',
-		tagline: 'Public beta, once Apple clears the build.',
-		status: 'In review by Apple',
-		since: '2026-07-14',
-		icon: '/icons/testflight.jpg'
-	},
-	{
-		n: '05',
-		kind: 'pending',
-		title: 'App Store',
-		tagline: 'The official listing. Release planned soon.',
-		status: 'Planned',
-		icon: '/icons/app-store.webp'
 	}
 ];
