@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { hoverPause, inView, onScreen, swipe, tilt } from '$lib/motion';
+	import { hoverPause, onScreen, swipe, tilt } from '$lib/motion';
 	import { screens } from '$lib/content';
 	import PhoneFrame from './PhoneFrame.svelte';
 	import { theme } from '$lib/theme.svelte';
@@ -123,8 +123,15 @@
 		<div class="stage" use:onScreen={(seen) => (visible = seen)}>
 			<!-- The entrance and the idle drift get an element each. Both want the
 			     `animation` property, and on one element the more specific rule would
-			     replace the other outright rather than adding to it. -->
-			<div use:inView class="reveal media" style="perspective: 1400px;">
+			     replace the other outright rather than adding to it.
+
+			     A load animation rather than a scroll one: the device sits just past the
+			     hero, close enough to be on the first screen at every viewport from a
+			     phone to a 27" display. The observer cannot give it an entrance there —
+			     it is already past the trigger line when the page loads, so it would be
+			     marked hidden and revealed in the same frame, never painting either
+			     state. It arrives on load instead, trailing the headline. -->
+			<div class="device load-rise" style="perspective: 1400px; --base: 420ms;">
 				<div class="float">
 					<!-- Wraps the frame exactly, so the pause covers the device and nothing
 					     of the stage's centring space around it. -->
