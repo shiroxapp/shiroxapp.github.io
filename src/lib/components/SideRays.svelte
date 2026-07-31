@@ -88,14 +88,14 @@ uniform float iBlend;
 uniform float iFalloff;
 uniform float iOpacity;
 
-float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord, float seedA, float seedB, float speed) {
+float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord, float seedA, float seedB, float speed, float refW) {
   vec2 sourceToCoord = coord - raySource;
   float cosAngle = dot(normalize(sourceToCoord), rayRefDirection);
   return clamp(
     (0.45 + 0.15 * sin(cosAngle * seedA + iTime * speed)) +
     (0.3 + 0.2 * cos(-cosAngle * seedB + iTime * speed)),
     0.0, 1.0) *
-    clamp((iResolution.x - length(sourceToCoord)) / iResolution.x, 0.5, 1.0);
+    clamp((refW - length(sourceToCoord)) / refW, 0.5, 1.0);
 }
 
 void main() {
@@ -103,8 +103,27 @@ void main() {
   if (iFlipX > 0.5) fragCoord.x = iResolution.x - fragCoord.x;
   if (iFlipY > 0.5) fragCoord.y = iResolution.y - fragCoord.y;
 
+  /* Every length below is measured in "unit" rather than in the viewport's own
+     width and height, because those two swap roles between a desktop and a
+     phone. The port placed the light 1.1 widths to the right and half a HEIGHT
+     above the top, then divided the falloff by the height — so on a 0.46:1
+     phone the vertical standoff grew while the horizontal one collapsed, and
+     the distance field spanned only 0.50..1.58 units instead of the desktop's
+     0.52..2.31. That left every pixel in the near field of the 1/distance^falloff
+     curve: measured, 37% of a phone screen came out above 0.2 alpha against 11%
+     of a desktop's, which is the wash that covered the whole screen.
+
+     "unit" is the diagonal scaled to equal iResolution.y at REF_ASPECT, so the
+     light's standoff now shrinks with the viewport and the field stays similar
+     at any shape. At REF_ASPECT itself it IS iResolution.y, which keeps the
+     tuning below (and the intensity/falloff pairs the page passes in) meaning
+     exactly what it meant when they were chosen on a 16:10 screen. */
+  const float REF_ASPECT = 1.6;
+  float unit = length(iResolution) / sqrt(REF_ASPECT * REF_ASPECT + 1.0);
+  float refW = REF_ASPECT * unit;
+
   vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);
-  vec2 rayPos = vec2(iResolution.x * 1.1, -0.5 * iResolution.y);
+  vec2 rayPos = vec2(iResolution.x + 0.1 * refW, -0.5 * unit);
 
   float tiltRad = iTilt * 3.14159265 / 180.0;
   float cs = cos(tiltRad);
@@ -116,12 +135,12 @@ void main() {
   vec2 rayRefDir1 = normalize(vec2(cos(0.785398 + halfSpread), sin(0.785398 + halfSpread)));
   vec2 rayRefDir2 = normalize(vec2(cos(0.785398 - halfSpread), sin(0.785398 - halfSpread)));
 
-  vec4 rays1 = vec4(iRayColor1, 1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed);
-  vec4 rays2 = vec4(iRayColor2, 1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed * 0.2);
+  vec4 rays1 = vec4(iRayColor1, 1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed, refW);
+  vec4 rays2 = vec4(iRayColor2, 1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed * 0.2, refW);
 
   vec4 color = rays1 * (1.0 - iBlend) * 0.9 + rays2 * iBlend * 0.9;
 
-  float distanceToLight = length(fragCoord.xy - vec2(rayPos.x, iResolution.y - rayPos.y)) / iResolution.y;
+  float distanceToLight = length(fragCoord.xy - vec2(rayPos.x, iResolution.y - rayPos.y)) / unit;
   float brightness = iIntensity * 0.4 / pow(max(distanceToLight, 0.001), iFalloff);
   color.rgb *= brightness;
 
