@@ -87,11 +87,28 @@ async function run() {
 	check('dividers are gone below sm', [...bar.querySelectorAll(':scope > span[aria-hidden]')].filter((s) => s.offsetParent !== null).length, '0');
 	check('progress hairline hidden below sm', shown(narrow, '.progress'), 'false');
 
+	/* Safari paints its toolbars from `theme-color` — the raw surface colour — so
+	   the rays have to reach zero by the bottom of the viewport or the page meets
+	   the toolbar on a different colour and the join reads as a seam on a real
+	   phone. Guarding the mask rather than the seam itself: the composited colour
+	   is a WebGL readback the DOM cannot see, but the mask is what guarantees it. */
+	const rayMask = (frame) => {
+		const el = frame.doc.querySelector('.rays');
+		if (!el) return 'missing';
+		const style = frame.win.getComputedStyle(el);
+		return style.maskImage || style.webkitMaskImage || 'none';
+	};
+	check('rays fade out before the toolbar below sm', rayMask(narrow), (v) =>
+		v.includes('linear-gradient')
+	);
+
 	const wide = await load('/index.html', 1100, 800);
 	const pill = wide.doc.querySelector('header > div');
 	check('desktop dock is still a pill', wide.win.getComputedStyle(pill).borderTopLeftRadius, (v) => parseFloat(v) > 10);
 	check('desktop dock is not full width', Math.round(pill.getBoundingClientRect().width), (v) => Number(v) < 1000);
 	check('progress hairline returns at sm and up', shown(wide, '.progress'), 'true');
+	// On a desktop there is no browser chrome to meet, and the full-height field is the look.
+	check('rays span the full height at sm and up', rayMask(wide), 'none');
 
 	await report();
 }
