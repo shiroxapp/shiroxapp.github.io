@@ -5,5 +5,5 @@ export const release = {
 	version: '1.0.3',
 	minOS: 'iOS 15+',
 	size: '~9 MB',
-	ipaUrl: 'https://github.com/xibrox/Shirox/releases/download/beta/Shirox.ipa'
+	ipaUrl: 'https://github.com/xibrox/Shirox/releases/download/beta/Shirox.ipa',
 } as const;

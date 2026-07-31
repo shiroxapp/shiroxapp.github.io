@@ -1,30 +1,30 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { release, sections, statLabels } from '$lib/content';
-	import { glowField, inView, inViewStagger, onScreen } from '$lib/motion';
-	import { loadStats, type Stats } from '$lib/stats';
-	import RevealHeading from './RevealHeading.svelte';
-	import StatTile from './StatTile.svelte';
+import { onMount } from 'svelte';
+import { links, release, sections, statLabels, TESTFLIGHT_URL } from '$lib/content';
+import { glowField, inView, inViewStagger, onScreen } from '$lib/motion';
+import { loadStats, type Stats } from '$lib/stats';
+import RevealHeading from './RevealHeading.svelte';
+import StatTile from './StatTile.svelte';
 
-	let visible = $state(false);
-	let stats: Stats = $state({
-		githubStars: null,
-		discordMembers: null,
-		testflightInstalls: null,
-		lastCommit: null
-	});
+let visible = $state(false);
+let stats: Stats = $state({
+	githubStars: null,
+	discordMembers: null,
+	testflightInstalls: null,
+	lastCommit: null,
+});
 
-	onMount(async () => {
-		stats = await loadStats();
-	});
+onMount(async () => {
+	stats = await loadStats();
+});
 
-	const lastCommitDisplay = $derived(
-		stats.lastCommit
-			? new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(
-					new Date(stats.lastCommit)
-				)
-			: null
-	);
+const lastCommitDisplay = $derived(
+	stats.lastCommit
+		? new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(
+				new Date(stats.lastCommit),
+			)
+		: null,
+);
 </script>
 
 <section
@@ -51,10 +51,30 @@
 		use:inViewStagger={70}
 		use:glowField
 	>
-		<StatTile label={statLabels.githubStars} value={stats.githubStars} {visible} />
-		<StatTile label={statLabels.discordMembers} value={stats.discordMembers} {visible} />
-		<StatTile label={statLabels.testflightInstalls} value={stats.testflightInstalls} {visible} />
-		<StatTile label={statLabels.version} value={`v${release.version}`} {visible} />
-		<StatTile label={statLabels.lastCommit} value={lastCommitDisplay ?? '—'} {visible} />
+		<StatTile
+			label={statLabels.githubStars}
+			value={stats.githubStars}
+			{visible}
+			href={links.github}
+		/>
+		<StatTile
+			label={statLabels.discordMembers}
+			value={stats.discordMembers}
+			{visible}
+			href={links.discord}
+		/>
+		<StatTile
+			label={statLabels.testflightInstalls}
+			value={stats.testflightInstalls}
+			{visible}
+			href={TESTFLIGHT_URL}
+		/>
+		<StatTile label={statLabels.version} value={`v${release.version}`} {visible} href={TESTFLIGHT_URL} />
+		<StatTile
+			label={statLabels.lastCommit}
+			value={lastCommitDisplay ?? '—'}
+			{visible}
+			href={links.github}
+		/>
 	</div>
 </section>

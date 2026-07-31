@@ -16,7 +16,7 @@ export const THEME_KEY = 'shirox-theme';
 
 const SURFACE: Record<Theme, string> = {
 	light: '#fafaf9',
-	dark: '#0b0b0c'
+	dark: '#0b0b0c',
 };
 
 let current = $state<Theme>('light');
@@ -79,5 +79,5 @@ export const theme = {
 		const sync = () => apply(mq.matches ? 'dark' : 'light', false);
 		mq.addEventListener('change', sync);
 		return () => mq.removeEventListener('change', sync);
-	}
+	},
 };

@@ -1,18 +1,14 @@
 <script lang="ts">
-	import { inViewStagger } from '$lib/motion';
+import { inViewStagger } from '$lib/motion';
 
-	/**
-	 * A heading that rises word by word when it reaches the viewport, matching how
-	 * the hero headline arrives — the lower sections were the only ones on the page
-	 * whose type just appeared.
-	 */
-	let {
-		text,
-		id,
-		class: klass = ''
-	}: { text: string; id?: string; class?: string } = $props();
+/**
+ * A heading that rises word by word when it reaches the viewport, matching how
+ * the hero headline arrives — the lower sections were the only ones on the page
+ * whose type just appeared.
+ */
+let { text, id, class: klass = '' }: { text: string; id?: string; class?: string } = $props();
 
-	const words = $derived(text.split(' '));
+const words = $derived(text.split(' '));
 </script>
 
 <!--

@@ -37,13 +37,15 @@ const server = Bun.serve({
 		}
 		if (pathname === '/__probe') {
 			return new Response(Bun.file(`${ROOT}scripts/probe.html`), {
-				headers: { 'content-type': 'text/html' }
+				headers: { 'content-type': 'text/html' },
 			});
 		}
 
 		const asset = Bun.file(`${ROOT}build${pathname === '/' ? '/index.html' : pathname}`);
-		return (await asset.exists()) ? new Response(asset) : new Response('not found', { status: 404 });
-	}
+		return (await asset.exists())
+			? new Response(asset)
+			: new Response('not found', { status: 404 });
+	},
 });
 
 const chrome = Bun.spawn([
@@ -51,7 +53,7 @@ const chrome = Bun.spawn([
 	'--headless=new',
 	'--disable-gpu',
 	'--window-size=1200,900',
-	`http://localhost:${server.port}/__probe`
+	`http://localhost:${server.port}/__probe`,
 ]);
 
 /* Chrome hangs retrying GCM registration long after it has done its work, so it is

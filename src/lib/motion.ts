@@ -44,7 +44,7 @@ function observe(nodes: Element[], onEnter: (batch: HTMLElement[]) => void) {
 			for (const el of arriving) io.unobserve(el);
 			onEnter(arriving);
 		},
-		{ rootMargin: '0px 0px -12% 0px' }
+		{ rootMargin: '0px 0px -12% 0px' },
 	);
 	for (const node of nodes) io.observe(node);
 	return { destroy: () => io.disconnect() };
@@ -115,7 +115,7 @@ export function tilt(node: HTMLElement, max = 5) {
 		destroy() {
 			cancelAnimationFrame(frame);
 			window.removeEventListener('pointermove', onMove);
-		}
+		},
 	};
 }
 
@@ -188,7 +188,7 @@ export function glowField(node: HTMLElement) {
 			ro.disconnect();
 			node.removeEventListener('pointerenter', onEnter);
 			node.removeEventListener('pointermove', onMove);
-		}
+		},
 	};
 }
 
@@ -208,7 +208,7 @@ export function hoverPause(node: HTMLElement, set: (hovering: boolean) => void) 
 		destroy() {
 			node.removeEventListener('pointerenter', enter);
 			node.removeEventListener('pointerleave', leave);
-		}
+		},
 	};
 }
 
@@ -256,7 +256,7 @@ export function swipe(node: HTMLElement, onSwipe: (delta: 1 | -1) => void, thres
 			node.removeEventListener('pointerdown', down);
 			node.removeEventListener('pointerup', up);
 			node.removeEventListener('pointercancel', cancel);
-		}
+		},
 	};
 }
 
@@ -284,7 +284,7 @@ export function scrollProgress(node: HTMLElement) {
 			cancelAnimationFrame(frame);
 			removeEventListener('scroll', update);
 			removeEventListener('resize', update);
-		}
+		},
 	};
 }
 
@@ -324,6 +324,6 @@ export function preconnectOnHover(node: HTMLAnchorElement) {
 	return {
 		destroy() {
 			node.removeEventListener('pointerenter', enter);
-		}
+		},
 	};
 }

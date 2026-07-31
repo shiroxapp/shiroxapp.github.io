@@ -44,18 +44,18 @@ export async function loadStats(): Promise<Stats> {
 	const [repo, commits, invite, local] = await Promise.all([
 		safeFetchJson<{ stargazers_count: number }>(`https://api.github.com/repos/${GITHUB_REPO}`),
 		safeFetchJson<{ commit: { committer: { date: string } } }[]>(
-			`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=1`
+			`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=1`,
 		),
 		safeFetchJson<{ approximate_member_count: number }>(
-			`https://discord.com/api/v9/invites/${DISCORD_INVITE_CODE}?with_counts=true`
+			`https://discord.com/api/v9/invites/${DISCORD_INVITE_CODE}?with_counts=true`,
 		),
-		safeFetchJson<{ testflightInstalls: number }>(STATS_URL)
+		safeFetchJson<{ testflightInstalls: number }>(STATS_URL),
 	]);
 
 	return {
 		githubStars: repo?.stargazers_count ?? null,
 		discordMembers: invite?.approximate_member_count ?? null,
 		testflightInstalls: local?.testflightInstalls ?? null,
-		lastCommit: commits?.[0]?.commit.committer.date ?? null
+		lastCommit: commits?.[0]?.commit.committer.date ?? null,
 	};
 }

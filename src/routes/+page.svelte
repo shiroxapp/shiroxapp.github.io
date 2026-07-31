@@ -1,25 +1,25 @@
 <script lang="ts">
-	import Nav from '$lib/components/Nav.svelte';
-	import Hero from '$lib/components/Hero.svelte';
-	import Showcase from '$lib/components/Showcase.svelte';
-	import Features from '$lib/components/Features.svelte';
-	import Stats from '$lib/components/Stats.svelte';
-	import Install from '$lib/components/Install.svelte';
-	import Footer from '$lib/components/Footer.svelte';
-	import SideRays from '$lib/components/SideRays.svelte';
-	import { theme } from '$lib/theme.svelte';
+import Features from '$lib/components/Features.svelte';
+import Footer from '$lib/components/Footer.svelte';
+import Hero from '$lib/components/Hero.svelte';
+import Install from '$lib/components/Install.svelte';
+import Nav from '$lib/components/Nav.svelte';
+import Showcase from '$lib/components/Showcase.svelte';
+import SideRays from '$lib/components/SideRays.svelte';
+import Stats from '$lib/components/Stats.svelte';
+import { theme } from '$lib/theme.svelte';
 
-	const title = 'Shirox — Anime & manga library manager for iOS';
-	const description =
-		'A free, source-available library manager for anime and manga on iOS 15+. Community modules, AniList and MyAnimeList sync, and offline downloads.';
+const title = 'Shirox — Anime & manga library manager for iOS';
+const description =
+	'A free, source-available library manager for anime and manga on iOS 15+. Community modules, AniList and MyAnimeList sync, and offline downloads.';
 
-	/** Served from the root of shiroxapp.github.io — see .github/workflows/pages.yml —
+/** Served from the root of shiroxapp.github.io — see .github/workflows/pages.yml —
 	    so this is also what Cloudflare serves; both hosts share one build. Absolute,
 	    since og:image and og:url have to be, not relative to whatever crawled them. */
-	const SITE_URL = 'https://shiroxapp.github.io';
-	const ogImage = `${SITE_URL}/og-image.png`;
+const SITE_URL = 'https://shiroxapp.github.io';
+const ogImage = `${SITE_URL}/og-image.png`;
 
-	/** White-on-dark barely needs help; the same rays on paper read as almost
+/** White-on-dark barely needs help; the same rays on paper read as almost
 	    nothing, so light mode gets darker strands instead of the same grays.
 	    Darkening the colour alone under-shoots, though — the shader ties alpha
 	    directly to the ray colour's own brightness (`color.a = max(color.rgb)`),
@@ -28,10 +28,10 @@
 	    (intensity 2, falloff 1.6) land around 6% alpha with these darker
 	    colours — near-invisible — while intensity 6 / falloff 1.3 lands around
 	    20%, clearly present without overwhelming the page. */
-	const rayColor1 = $derived(theme.current === 'light' ? '#8a8a8a' : '#ffffff');
-	const rayColor2 = $derived(theme.current === 'light' ? '#3f3f3f' : '#8a8a8a');
-	const rayIntensity = $derived(theme.current === 'light' ? 6 : 2);
-	const rayFalloff = $derived(theme.current === 'light' ? 1.3 : 1.6);
+const rayColor1 = $derived(theme.current === 'light' ? '#8a8a8a' : '#ffffff');
+const rayColor2 = $derived(theme.current === 'light' ? '#3f3f3f' : '#8a8a8a');
+const rayIntensity = $derived(theme.current === 'light' ? 6 : 2);
+const rayFalloff = $derived(theme.current === 'light' ? 1.3 : 1.6);
 </script>
 
 <svelte:head>

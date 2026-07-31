@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 /**
  * Minifies every prerendered HTML file after `vite build`. Vite's own
  * `build.minify` covers the JS and CSS bundles; it never touches the HTML
@@ -11,8 +13,6 @@
  * stale but working file behind.
  */
 import { minify } from 'html-minifier-terser';
-import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
 const OUT_DIR = new URL('../build', import.meta.url).pathname.replace(/^\/([a-zA-Z]:)/, '$1');
 
@@ -23,7 +23,7 @@ async function htmlFiles(dir: string): Promise<string[]> {
 			const path = join(dir, entry.name);
 			if (entry.isDirectory()) return htmlFiles(path);
 			return entry.name.endsWith('.html') ? [path] : [];
-		})
+		}),
 	);
 	return files.flat();
 }
@@ -39,7 +39,7 @@ for (const file of files) {
 		minifyJS: true,
 		removeAttributeQuotes: false,
 		sortAttributes: true,
-		sortClassName: true
+		sortClassName: true,
 	});
 	await writeFile(file, after);
 	console.log(`minified ${file.slice(OUT_DIR.length + 1)}: ${before.length}B -> ${after.length}B`);

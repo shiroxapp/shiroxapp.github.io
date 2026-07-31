@@ -1,76 +1,77 @@
 <script lang="ts">
-	/**
-	 * TEMP: background test, ported from a React/ogl component. Kept behind a
-	 * plain wrapper in +page.svelte for now — promote (restyle, wire to the
-	 * theme) or delete before this becomes permanent.
-	 *
-	 * ogl is a thin WebGL wrapper with no framework binding of its own, so the
-	 * render loop below is close to a 1:1 port; only the mount/teardown and
-	 * prop-reactivity are rewritten for Svelte's effect model. The context is
-	 * built once per visibility (via `untrack`, so a prop change alone doesn't
-	 * tear down and recreate the WebGL context); a second, lighter effect pushes
-	 * new prop values into the existing uniforms.
-	 */
-	import { untrack } from 'svelte';
-	import { Mesh, Program, Renderer, Triangle } from 'ogl';
+/**
+ * TEMP: background test, ported from a React/ogl component. Kept behind a
+ * plain wrapper in +page.svelte for now — promote (restyle, wire to the
+ * theme) or delete before this becomes permanent.
+ *
+ * ogl is a thin WebGL wrapper with no framework binding of its own, so the
+ * render loop below is close to a 1:1 port; only the mount/teardown and
+ * prop-reactivity are rewritten for Svelte's effect model. The context is
+ * built once per visibility (via `untrack`, so a prop change alone doesn't
+ * tear down and recreate the WebGL context); a second, lighter effect pushes
+ * new prop values into the existing uniforms.
+ */
 
-	type Origin = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+import { Mesh, Program, Renderer, Triangle } from 'ogl';
+import { untrack } from 'svelte';
 
-	let {
-		speed = 2.5,
-		rayColor1 = '#ffffff',
-		rayColor2 = '#8a8a8a',
-		intensity = 2,
-		spread = 2,
-		origin = 'top-right',
-		tilt = 0,
-		saturation = 0.15,
-		blend = 0.75,
-		falloff = 2.0,
-		opacity = 1.0,
-		class: className = ''
-	}: {
-		speed?: number;
-		rayColor1?: string;
-		rayColor2?: string;
-		intensity?: number;
-		spread?: number;
-		origin?: Origin;
-		tilt?: number;
-		saturation?: number;
-		blend?: number;
-		falloff?: number;
-		opacity?: number;
-		class?: string;
-	} = $props();
+type Origin = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
-	const hexToRgb = (hex: string): [number, number, number] => {
-		const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		return m
-			? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255]
-			: [1, 1, 1];
-	};
+let {
+	speed = 2.5,
+	rayColor1 = '#ffffff',
+	rayColor2 = '#8a8a8a',
+	intensity = 2,
+	spread = 2,
+	origin = 'top-right',
+	tilt = 0,
+	saturation = 0.15,
+	blend = 0.75,
+	falloff = 2.0,
+	opacity = 1.0,
+	class: className = '',
+}: {
+	speed?: number;
+	rayColor1?: string;
+	rayColor2?: string;
+	intensity?: number;
+	spread?: number;
+	origin?: Origin;
+	tilt?: number;
+	saturation?: number;
+	blend?: number;
+	falloff?: number;
+	opacity?: number;
+	class?: string;
+} = $props();
 
-	const originToFlip = (o: Origin): [number, number] => {
-		switch (o) {
-			case 'top-left':
-				return [1, 0];
-			case 'bottom-right':
-				return [0, 1];
-			case 'bottom-left':
-				return [1, 1];
-			default:
-				return [0, 0];
-		}
-	};
+const hexToRgb = (hex: string): [number, number, number] => {
+	const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return m
+		? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255]
+		: [1, 1, 1];
+};
 
-	const vert = `
+const originToFlip = (o: Origin): [number, number] => {
+	switch (o) {
+		case 'top-left':
+			return [1, 0];
+		case 'bottom-right':
+			return [0, 1];
+		case 'bottom-left':
+			return [1, 1];
+		default:
+			return [0, 0];
+	}
+};
+
+const vert = `
 attribute vec2 position;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
 }`;
 
-	const frag = `precision highp float;
+const frag = `precision highp float;
 
 uniform float iTime;
 uniform vec2 iResolution;
@@ -131,110 +132,129 @@ void main() {
   gl_FragColor = color;
 }`;
 
-	type Uniforms = Record<string, { value: number | number[] }>;
+type Uniforms = Record<string, { value: number | number[] }>;
 
-	let container: HTMLDivElement | undefined = $state();
-	let visible = $state(false);
-	let uniforms: Uniforms | null = null;
+let container: HTMLDivElement | undefined = $state();
+let visible = $state(false);
+/** Flips true once the first frame has actually rendered, so the canvas
+	    fades in over its content rather than popping in the instant the WebGL
+	    context finishes setting up. */
+let ready = $state(false);
+let uniforms: Uniforms | null = null;
 
-	$effect(() => {
-		if (!container) return;
-		const observer = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), {
-			threshold: 0.1
-		});
-		observer.observe(container);
-		return () => observer.disconnect();
+$effect(() => {
+	if (!container) return;
+	const observer = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), {
+		threshold: 0.1,
 	});
+	observer.observe(container);
+	return () => observer.disconnect();
+});
 
-	$effect(() => {
-		if (!visible || !container) return;
-		const target = container;
+$effect(() => {
+	if (!visible || !container) return;
+	const target = container;
 
-		return untrack(() => {
-			const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
-			const gl = renderer.gl;
-			gl.canvas.style.width = '100%';
-			gl.canvas.style.height = '100%';
+	return untrack(() => {
+		const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
+		const gl = renderer.gl;
+		gl.canvas.style.width = '100%';
+		gl.canvas.style.height = '100%';
 
-			while (target.firstChild) target.removeChild(target.firstChild);
-			target.appendChild(gl.canvas);
+		while (target.firstChild) target.removeChild(target.firstChild);
+		target.appendChild(gl.canvas);
 
-			const [flipX, flipY] = originToFlip(origin);
-			const localUniforms: Uniforms = {
-				iTime: { value: 0 },
-				iResolution: { value: [1, 1] },
-				iSpeed: { value: speed },
-				iRayColor1: { value: hexToRgb(rayColor1) },
-				iRayColor2: { value: hexToRgb(rayColor2) },
-				iIntensity: { value: intensity },
-				iSpread: { value: spread },
-				iFlipX: { value: flipX },
-				iFlipY: { value: flipY },
-				iTilt: { value: tilt },
-				iSaturation: { value: saturation },
-				iBlend: { value: blend },
-				iFalloff: { value: falloff },
-				iOpacity: { value: opacity }
-			};
-			uniforms = localUniforms;
-
-			const geometry = new Triangle(gl);
-			const program = new Program(gl, { vertex: vert, fragment: frag, uniforms: localUniforms });
-			const mesh = new Mesh(gl, { geometry, program });
-
-			let frame = 0;
-			let stopped = false;
-
-			const updateSize = () => {
-				renderer.dpr = Math.min(window.devicePixelRatio, 2);
-				const { clientWidth: w, clientHeight: h } = target;
-				renderer.setSize(w, h);
-				localUniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
-			};
-
-			const loop = (t: number) => {
-				if (stopped) return;
-				localUniforms.iTime.value = t * 0.001;
-				renderer.render({ scene: mesh });
-				frame = requestAnimationFrame(loop);
-			};
-
-			window.addEventListener('resize', updateSize);
-			updateSize();
-			frame = requestAnimationFrame(loop);
-
-			return () => {
-				stopped = true;
-				uniforms = null;
-				cancelAnimationFrame(frame);
-				window.removeEventListener('resize', updateSize);
-				const loseContext = gl.getExtension('WEBGL_lose_context');
-				loseContext?.loseContext();
-				gl.canvas.remove();
-			};
-		});
-	});
-
-	/** Pushes prop changes into the running context without tearing it down. */
-	$effect(() => {
-		if (!uniforms) return;
 		const [flipX, flipY] = originToFlip(origin);
-		uniforms.iSpeed.value = speed;
-		uniforms.iRayColor1.value = hexToRgb(rayColor1);
-		uniforms.iRayColor2.value = hexToRgb(rayColor2);
-		uniforms.iIntensity.value = intensity;
-		uniforms.iSpread.value = spread;
-		uniforms.iFlipX.value = flipX;
-		uniforms.iFlipY.value = flipY;
-		uniforms.iTilt.value = tilt;
-		uniforms.iSaturation.value = saturation;
-		uniforms.iBlend.value = blend;
-		uniforms.iFalloff.value = falloff;
-		uniforms.iOpacity.value = opacity;
+		const localUniforms: Uniforms = {
+			iTime: { value: 0 },
+			iResolution: { value: [1, 1] },
+			iSpeed: { value: speed },
+			iRayColor1: { value: hexToRgb(rayColor1) },
+			iRayColor2: { value: hexToRgb(rayColor2) },
+			iIntensity: { value: intensity },
+			iSpread: { value: spread },
+			iFlipX: { value: flipX },
+			iFlipY: { value: flipY },
+			iTilt: { value: tilt },
+			iSaturation: { value: saturation },
+			iBlend: { value: blend },
+			iFalloff: { value: falloff },
+			iOpacity: { value: opacity },
+		};
+		uniforms = localUniforms;
+
+		const geometry = new Triangle(gl);
+		const program = new Program(gl, { vertex: vert, fragment: frag, uniforms: localUniforms });
+		const mesh = new Mesh(gl, { geometry, program });
+
+		let frame = 0;
+		let stopped = false;
+
+		const updateSize = () => {
+			renderer.dpr = Math.min(window.devicePixelRatio, 2);
+			const { clientWidth: w, clientHeight: h } = target;
+			renderer.setSize(w, h);
+			localUniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
+		};
+
+		const loop = (t: number) => {
+			if (stopped) return;
+			localUniforms.iTime.value = t * 0.001;
+			renderer.render({ scene: mesh });
+			ready = true;
+			frame = requestAnimationFrame(loop);
+		};
+
+		window.addEventListener('resize', updateSize);
+		updateSize();
+		frame = requestAnimationFrame(loop);
+
+		return () => {
+			stopped = true;
+			uniforms = null;
+			ready = false;
+			cancelAnimationFrame(frame);
+			window.removeEventListener('resize', updateSize);
+			const loseContext = gl.getExtension('WEBGL_lose_context');
+			loseContext?.loseContext();
+			gl.canvas.remove();
+		};
 	});
+});
+
+/** Pushes prop changes into the running context without tearing it down. */
+$effect(() => {
+	if (!uniforms) return;
+	const [flipX, flipY] = originToFlip(origin);
+	uniforms.iSpeed.value = speed;
+	uniforms.iRayColor1.value = hexToRgb(rayColor1);
+	uniforms.iRayColor2.value = hexToRgb(rayColor2);
+	uniforms.iIntensity.value = intensity;
+	uniforms.iSpread.value = spread;
+	uniforms.iFlipX.value = flipX;
+	uniforms.iFlipY.value = flipY;
+	uniforms.iTilt.value = tilt;
+	uniforms.iSaturation.value = saturation;
+	uniforms.iBlend.value = blend;
+	uniforms.iFalloff.value = falloff;
+	uniforms.iOpacity.value = opacity;
+});
 </script>
 
 <div
 	bind:this={container}
-	class="pointer-events-none relative h-full w-full overflow-hidden {className}"
+	class="fade pointer-events-none relative h-full w-full overflow-hidden {className}"
+	style="opacity: {ready ? 1 : 0};"
 ></div>
+
+<style>
+	.fade {
+		transition: opacity 1.2s var(--ease, ease-out);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fade {
+			transition: none;
+		}
+	}
+</style>

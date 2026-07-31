@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { features, sections } from '$lib/content';
-	import { glowField, inView, inViewStagger } from '$lib/motion';
-	import RevealHeading from './RevealHeading.svelte';
+import { features, sections } from '$lib/content';
+import { glowField, inView, inViewStagger } from '$lib/motion';
+import RevealHeading from './RevealHeading.svelte';
 </script>
 
 <section

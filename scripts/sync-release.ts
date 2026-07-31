@@ -82,7 +82,7 @@ function render(latest: ManifestVersion) {
 		version: latest.version,
 		minOS: formatMinOS(latest.minOSVersion),
 		size: formatSize(latest.size),
-		ipaUrl: latest.downloadURL
+		ipaUrl: latest.downloadURL,
 	};
 
 	for (const [key, value] of Object.entries(fields)) {
@@ -106,14 +106,16 @@ export const release = {
 async function main() {
 	const response = await fetch(SOURCE_URL, {
 		signal: AbortSignal.timeout(15_000),
-		headers: { accept: 'application/json' }
+		headers: { accept: 'application/json' },
 	});
 
 	if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
 
 	const latest = newest(pickApp((await response.json()) as Manifest).versions);
 	const next = render(latest);
-	const current = await Bun.file(OUT).text().catch(() => '');
+	const current = await Bun.file(OUT)
+		.text()
+		.catch(() => '');
 
 	if (current === next) {
 		console.log(`release: already current at v${latest.version}`);

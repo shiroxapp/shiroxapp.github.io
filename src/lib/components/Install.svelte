@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { installMethods, sections } from '$lib/content';
-	import { glowField, inView, inViewStagger, preconnectOnHover } from '$lib/motion';
-	import CopyField from './CopyField.svelte';
-	import RevealHeading from './RevealHeading.svelte';
+import { installMethods, sections } from '$lib/content';
+import { glowField, inView, inViewStagger, preconnectOnHover } from '$lib/motion';
+import CopyField from './CopyField.svelte';
+import RevealHeading from './RevealHeading.svelte';
 
-	/** Which app (by index into the recommended method's `apps`) the pointer is
+/** Which app (by index into the recommended method's `apps`) the pointer is
 	    over — its name, or its deep link below — so the split badge can open
 	    fully toward it. `null` at rest, back to the 70/30 default cut. */
-	let focusApp: number | null = $state(null);
-	const split = $derived(focusApp === 0 ? [100, 100] : focusApp === 1 ? [0, 0] : [70, 30]);
+let focusApp: number | null = $state(null);
+const split = $derived(focusApp === 0 ? [100, 100] : focusApp === 1 ? [0, 0] : [70, 30]);
 </script>
 
 <section
@@ -42,6 +42,7 @@
 			{#if method.kind === 'source'}
 				<article
 					class="card lead glow relative overflow-hidden rounded-2xl p-7 md:col-span-2 md:p-10"
+					class:recommended={method.recommended}
 				>
 					{#if method.recommended}
 						<span class="edge" aria-hidden="true"></span>
@@ -128,18 +129,6 @@
 									onmouseleave={() => (focusApp = null)}
 								>
 									<span class="ul">{deepLink.label}</span>
-									<svg
-										class="h-2.5 w-2.5 transition-transform duration-300 ease-out group-hover/link:scale-110"
-										viewBox="0 0 12 12"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="1.6"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										aria-hidden="true"
-									>
-										<path d="M6 1v10M1 6h10" />
-									</svg>
 								</a>
 							{/each}
 							<span class="text-[0.8125rem]" style="color: var(--muted);">on device</span>
@@ -149,6 +138,7 @@
 			{:else}
 				<article
 					class="card glow relative flex flex-col overflow-hidden rounded-2xl p-7 md:p-8"
+					class:recommended={method.recommended}
 				>
 					{#if method.recommended}
 						<span class="edge" aria-hidden="true"></span>
@@ -196,20 +186,7 @@
 								class="group/link inline-flex items-center gap-2 text-[0.9375rem] font-medium"
 							>
 								<span class="ul">{method.action}</span>
-								{#if method.kind === 'join'}
-									<svg
-										class="h-2.5 w-2.5 transition-transform duration-300 ease-out group-hover/link:scale-110"
-										viewBox="0 0 12 12"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="1.6"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										aria-hidden="true"
-									>
-										<path d="M6 1v10M1 6h10" />
-									</svg>
-								{:else}
+								{#if method.kind !== 'join'}
 									<svg
 										class="mt-0.5 h-3 w-3 transition-transform duration-300 ease-out group-hover/link:translate-y-0.5"
 										viewBox="0 0 12 12"
@@ -316,6 +293,14 @@
 		}
 
 		.card:hover img[src='/icons/github.jpg'] {
+			opacity: 1;
+		}
+
+		/* The recommended route is the one answer to "which do I pick", so its
+		   icon wears its own colour permanently rather than waiting on hover
+		   like the alternatives below it — same idea as `.edge`. */
+		.card.recommended img {
+			filter: grayscale(0);
 			opacity: 1;
 		}
 	}

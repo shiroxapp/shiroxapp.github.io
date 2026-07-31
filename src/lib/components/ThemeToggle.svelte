@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { theme } from '$lib/theme.svelte';
+import { theme } from '$lib/theme.svelte';
 
-	/** The inline script in app.html has already set the attribute; adopt it. */
-	$effect(() => theme.sync());
+/** The inline script in app.html has already set the attribute; adopt it. */
+$effect(() => theme.sync());
 
-	/** Keeps following the OS theme live, unless this visitor has chosen one. */
-	$effect(() => theme.followSystem());
+/** Keeps following the OS theme live, unless this visitor has chosen one. */
+$effect(() => theme.followSystem());
 
-	const dark = $derived(theme.current === 'dark');
+const dark = $derived(theme.current === 'dark');
 </script>
 
 <button

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { links } from '$lib/content';
-	import { preconnectOnHover, scrollProgress } from '$lib/motion';
-	import ShiroMark from './ShiroMark.svelte';
-	import ThemeToggle from './ThemeToggle.svelte';
+import { links } from '$lib/content';
+import { preconnectOnHover, scrollProgress } from '$lib/motion';
+import ShiroMark from './ShiroMark.svelte';
+import ThemeToggle from './ThemeToggle.svelte';
 </script>
 
 <!-- Scroll position, as a single hairline along the very top edge. It sits above

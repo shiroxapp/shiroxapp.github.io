@@ -12,14 +12,15 @@
 			src/lib/theme.svelte.ts.
 		-->
 		<script>
+			var stored, dark;
 			try {
-				var stored = localStorage.getItem('shirox-theme');
-				var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+				stored = localStorage.getItem('shirox-theme');
+				dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
 				if (dark) {
 					document.documentElement.dataset.theme = 'dark';
 					document.querySelector('meta[name="theme-color"]').content = '#0b0b0c';
 				}
-			} catch (e) {}
+			} catch {}
 		</script>
 		%sveltekit.head%
 	</head>

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { footer, links } from '$lib/content';
+import { footer, links } from '$lib/content';
 
-	const social = [
-		{ label: 'GitHub', href: links.github },
-		{ label: 'Discord', href: links.discord },
-		{ label: 'Ko-fi', href: links.kofi }
-	];
+const social = [
+	{ label: 'GitHub', href: links.github },
+	{ label: 'Discord', href: links.discord },
+	{ label: 'Ko-fi', href: links.kofi },
+];
 </script>
 
 <footer class="border-t backdrop-blur-xl" style="border-color: var(--rule); background: var(--glass);">
