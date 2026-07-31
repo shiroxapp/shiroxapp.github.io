@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onMount } from 'svelte';
-import { links, release, sections, statLabels, TESTFLIGHT_URL } from '$lib/content';
+import { links, release, sections, statLabels } from '$lib/content';
 import { glowField, inView, inViewStagger, onScreen } from '$lib/motion';
 import { loadStats, type Stats } from '$lib/stats';
 import RevealHeading from './RevealHeading.svelte';
@@ -67,9 +67,14 @@ const lastCommitDisplay = $derived(
 			label={statLabels.testflightInstalls}
 			value={stats.testflightInstalls}
 			{visible}
-			href={TESTFLIGHT_URL}
+			href={links.testflight}
 		/>
-		<StatTile label={statLabels.version} value={`v${release.version}`} {visible} href={TESTFLIGHT_URL} />
+		<StatTile
+			label={statLabels.version}
+			value={`v${release.version}`}
+			{visible}
+			href={links.testflight}
+		/>
 		<StatTile
 			label={statLabels.lastCommit}
 			value={lastCommitDisplay ?? '—'}
