@@ -1,12 +1,12 @@
 <script lang="ts">
-	/**
-	 * The kanji 白 (shiro, "white") — the Shirox app icon, traced as vector strokes
-	 * so it is crisp at any size and costs no image request.
-	 *
-	 * `draw` wipes the strokes in one after another on load, in the order a hand
-	 * would write them. Sized by the caller via `class`; colored via currentColor.
-	 */
-	let { class: className = '', draw = false }: { class?: string; draw?: boolean } = $props();
+/**
+ * The kanji 白 (shiro, "white") — the Shirox app icon, traced as vector strokes
+ * so it is crisp at any size and costs no image request.
+ *
+ * `draw` wipes the strokes in one after another on load, in the order a hand
+ * would write them. Sized by the caller via `class`; colored via currentColor.
+ */
+let { class: className = '', draw = false }: { class?: string; draw?: boolean } = $props();
 </script>
 
 <svg class={className} viewBox="0 0 1024 1024" fill="currentColor" aria-hidden="true">

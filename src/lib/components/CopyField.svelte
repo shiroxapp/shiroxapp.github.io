@@ -1,65 +1,65 @@
 <script lang="ts">
-	/**
-	 * A URL with a copy button. Three states, so a failed clipboard write never
-	 * reports success: idle → copied, or idle → manual (clipboard unavailable or
-	 * blocked), where the text is selected so ⌘C still works.
-	 */
-	let { value }: { value: string } = $props();
+/**
+ * A URL with a copy button. Three states, so a failed clipboard write never
+ * reports success: idle → copied, or idle → manual (clipboard unavailable or
+ * blocked), where the text is selected so ⌘C still works.
+ */
+let { value }: { value: string } = $props();
 
-	const fieldId = $props.id();
-	let status = $state<'idle' | 'copied' | 'manual'>('idle');
-	let timer: ReturnType<typeof setTimeout> | undefined;
-	let button: HTMLButtonElement | undefined = $state();
+const fieldId = $props.id();
+let status = $state<'idle' | 'copied' | 'manual'>('idle');
+let timer: ReturnType<typeof setTimeout> | undefined;
+let button: HTMLButtonElement | undefined = $state();
 
-	const labels = { idle: 'Copy', copied: 'Copied', manual: '⌘C' } as const;
-	/** The faces are stacked and hidden from assistive tech, so the button carries
+const labels = { idle: 'Copy', copied: 'Copied', manual: '⌘C' } as const;
+/** The faces are stacked and hidden from assistive tech, so the button carries
 	    its own name — and can spell out what the ⌘C face only symbolises. */
-	const names = {
-		idle: 'Copy URL',
-		copied: 'Copied',
-		manual: 'Copy failed — press Command C'
-	} as const;
-	const announcements = {
-		idle: '',
-		copied: 'Copied to clipboard',
-		manual: 'Copy failed — the URL is selected, press Command C'
-	} as const;
+const names = {
+	idle: 'Copy URL',
+	copied: 'Copied',
+	manual: 'Copy failed — press Command C',
+} as const;
+const announcements = {
+	idle: '',
+	copied: 'Copied to clipboard',
+	manual: 'Copy failed — the URL is selected, press Command C',
+} as const;
 
-	function selectField() {
-		const node = document.getElementById(fieldId);
-		if (!node) return;
-		const range = document.createRange();
-		range.selectNodeContents(node);
-		const selection = getSelection();
-		selection?.removeAllRanges();
-		selection?.addRange(range);
-	}
+function selectField() {
+	const node = document.getElementById(fieldId);
+	if (!node) return;
+	const range = document.createRange();
+	range.selectNodeContents(node);
+	const selection = getSelection();
+	selection?.removeAllRanges();
+	selection?.addRange(range);
+}
 
-	/**
-	 * The confirmation beat. Scripted rather than declared because the button and
-	 * its classes survive every click: a CSS animation would play on the first
-	 * copy and then sit finished, leaving repeat copies with no acknowledgement.
-	 */
-	function pop() {
-		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		button?.animate([{ scale: '1' }, { scale: '1.055', offset: 0.32 }, { scale: '1' }], {
-			duration: 420,
-			easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
-		});
-	}
+/**
+ * The confirmation beat. Scripted rather than declared because the button and
+ * its classes survive every click: a CSS animation would play on the first
+ * copy and then sit finished, leaving repeat copies with no acknowledgement.
+ */
+function pop() {
+	if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+	button?.animate([{ scale: '1' }, { scale: '1.055', offset: 0.32 }, { scale: '1' }], {
+		duration: 420,
+		easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+	});
+}
 
-	async function copy() {
-		clearTimeout(timer);
-		try {
-			await navigator.clipboard.writeText(value);
-			status = 'copied';
-			pop();
-		} catch {
-			status = 'manual';
-			selectField();
-		}
-		timer = setTimeout(() => (status = 'idle'), 2400);
+async function copy() {
+	clearTimeout(timer);
+	try {
+		await navigator.clipboard.writeText(value);
+		status = 'copied';
+		pop();
+	} catch {
+		status = 'manual';
+		selectField();
 	}
+	timer = setTimeout(() => (status = 'idle'), 2400);
+}
 </script>
 
 <div class="flex items-center gap-1 rounded-xl py-1 pr-1 pl-3.5" style="background: var(--sunken);">

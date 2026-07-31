@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
 <body style="margin:0">
 <script>
 const checks = [];
@@ -107,7 +107,7 @@ function report() {
 /* A check that throws must not take the run with it: an unreported probe looks
    identical to a hung browser, and says nothing about which check broke. */
 run().catch((error) => {
-	check(`probe threw: ${error && error.message}`, error && error.stack, () => false);
+	check(`probe threw: ${error?.message}`, error?.stack, () => false);
 	report();
 });
 </script>

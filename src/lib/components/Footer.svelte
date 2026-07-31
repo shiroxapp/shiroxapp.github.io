@@ -1,25 +1,23 @@
 <script lang="ts">
-	import { links, release } from '$lib/content';
-	import ShiroMark from './ShiroMark.svelte';
+import { footer, links } from '$lib/content';
 
-	const social = [
-		{ label: 'GitHub', href: links.github },
-		{ label: 'Discord', href: links.discord },
-		{ label: 'Ko-fi', href: links.kofi }
-	];
+const social = [
+	{ label: 'GitHub', href: links.github },
+	{ label: 'Discord', href: links.discord },
+	{ label: 'Ko-fi', href: links.kofi },
+];
 </script>
 
-<footer class="border-t" style="border-color: var(--rule);">
+<footer class="border-t backdrop-blur-xl" style="border-color: var(--rule); background: var(--glass);">
 	<div
 		class="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10 sm:flex-row sm:items-center sm:justify-between"
 	>
 		<p class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem]">
-			<ShiroMark class="h-3 w-3" />
 			<span style="color: var(--muted);">
-				Shirox v{release.version} · by
+				Shirox {footer.year} · by
 				<a href={links.author} target="_blank" rel="noreferrer" class="ul">xibrox</a>
 				·
-				<a href={links.license} target="_blank" rel="noreferrer" class="ul">PolyForm NC</a>
+				<a href={links.license} target="_blank" rel="noreferrer" class="ul">{footer.licenseLabel}</a>
 			</span>
 		</p>
 
