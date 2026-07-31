@@ -11,8 +11,8 @@
  * deploy, and the warning says which of the two you got.
  */
 
-/** The same manifest AltStore reads. Mirrored as SOURCE_URL in src/lib/content.ts. */
-const SOURCE_URL = 'https://raw.githubusercontent.com/xibrox/Shirox/refs/heads/main/apps.json';
+import config from '../src/lib/config.json';
+
 const OUT = new URL('../src/lib/release.generated.ts', import.meta.url);
 
 type ManifestVersion = {
@@ -104,7 +104,7 @@ export const release = {
 }
 
 async function main() {
-	const response = await fetch(SOURCE_URL, {
+	const response = await fetch(config.github.rawSourceUrl, {
 		signal: AbortSignal.timeout(15_000),
 		headers: { accept: 'application/json' },
 	});

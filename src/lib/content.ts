@@ -12,8 +12,8 @@
  * build time rather than typed here — see scripts/sync-release.ts. Shipping a
  * release updates the site on its next build with no edit to this file.
  */
+import config from './config.json';
 import { release } from './release.generated';
-import { safeMode } from './safe-mode';
 
 export type Feature = { n: string; title: string; body: string };
 
@@ -98,11 +98,12 @@ export const statLabels: Record<StatKey, string> = {
 export { release };
 
 export const links = {
-	github: 'https://github.com/xibrox/Shirox',
-	discord: 'https://discord.com/invite/b9tZSuJj73',
-	kofi: 'https://ko-fi.com/xibrox',
-	license: 'https://github.com/xibrox/Shirox/blob/main/LICENSE',
-	author: 'https://github.com/xibrox',
+	github: config.github.url,
+	discord: config.discord.inviteUrl,
+	kofi: config.kofi.url,
+	license: config.github.licenseUrl,
+	author: config.github.authorUrl,
+	testflight: config.testflight.url,
 } as const;
 
 export const footer = {
@@ -121,7 +122,9 @@ export const features: Feature[] = [
 	{
 		n: '01',
 		title: 'Community modules',
-		body: safeMode ? 'Bring your own catalog sources.' : 'Add a source, search it, watch it.',
+		body: config.safeMode
+			? 'Bring your own catalog sources.'
+			: 'Add a source, search it, watch it.',
 	},
 	{ n: '02', title: 'Anime and manga', body: 'One library for both, with a real reader.' },
 	{ n: '03', title: 'Tracking', body: 'AniList and MyAnimeList. Offline edits catch up.' },
@@ -268,14 +271,9 @@ const allScreens: Screen[] = [
 
 /** The player is the one screen that reads as playback of unlicensed content
     out of context, so a review build drops it rather than just relabels it. */
-export const screens: Screen[] = safeMode
+export const screens: Screen[] = config.safeMode
 	? allScreens.filter((screen) => screen.label !== 'Player')
 	: allScreens;
-
-/** Mirrored in scripts/sync-release.ts, which reads the same manifest at build time. */
-const SOURCE_URL = 'https://raw.githubusercontent.com/xibrox/Shirox/refs/heads/main/apps.json';
-export const TESTFLIGHT_URL = 'https://testflight.apple.com/join/jvGzcXYh';
-const NIGHTLY_URL = 'https://nightly.link/xibrox/Shirox/workflows/nightly.yaml/main?preview';
 
 export const installMethods: InstallMethod[] = [
 	{
@@ -283,7 +281,7 @@ export const installMethods: InstallMethod[] = [
 		kind: 'join',
 		title: 'TestFlight',
 		tagline: 'Public beta, straight from Apple.',
-		url: TESTFLIGHT_URL,
+		url: config.testflight.url,
 		recommended: true,
 		action: 'Join the beta',
 		meta: '~21 MB · iOS 15+',
@@ -302,17 +300,14 @@ export const installMethods: InstallMethod[] = [
 		kind: 'source',
 		title: 'AltStore / SideStore',
 		tagline: 'Add the source once. Updates arrive on their own.',
-		url: SOURCE_URL,
+		url: config.github.rawSourceUrl,
 		apps: [
 			{ name: 'AltStore', icon: '/icons/altstore.jpg' },
 			{ name: 'SideStore', icon: '/icons/sidestore.jpg' },
 		],
 		deepLinks: [
-			{ label: 'Add to AltStore', href: `altstore://source?url=${encodeURIComponent(SOURCE_URL)}` },
-			{
-				label: 'Add to SideStore',
-				href: `sidestore://source?url=${encodeURIComponent(SOURCE_URL)}`,
-			},
+			{ label: 'Add to AltStore', href: config.altstore.url },
+			{ label: 'Add to SideStore', href: config.sidestore.url },
 		],
 	},
 	{
@@ -330,7 +325,7 @@ export const installMethods: InstallMethod[] = [
 		kind: 'download',
 		title: 'Nightly',
 		tagline: 'Latest build from main. May be unstable.',
-		url: NIGHTLY_URL,
+		url: config.nightly.url,
 		action: 'Download',
 		icon: '/icons/github.jpg',
 	},
