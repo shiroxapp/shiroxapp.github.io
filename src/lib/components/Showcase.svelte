@@ -264,7 +264,6 @@ function onKeydown(event: KeyboardEvent) {
 					onfocus={() => (focused = true)}
 					onblur={() => (focused = false)}
 					class="tab press mono shrink-0 px-3 py-2.5 text-[0.6875rem] tracking-[0.14em] uppercase"
-					style="color: {active === i ? 'var(--fg)' : 'var(--muted)'};"
 				>
 					{screen.label}
 					<span class="track"></span>
@@ -349,15 +348,31 @@ function onKeydown(event: KeyboardEvent) {
 		object-fit: contain;
 	}
 
+	/* Colour reads off `aria-selected` rather than the style attribute it used to be
+	   written to. An inline declaration outranks every selector, so while it was
+	   there the `:hover` below could never apply — the tabs were the one row of
+	   controls on the page that didn't answer the pointer. The attribute already
+	   says which tab is current, so nothing new has to track it. */
 	.tab {
 		position: relative;
+		color: var(--muted);
 		transition:
 			color 0.5s var(--ease),
 			scale 0.35s var(--ease-hover);
 	}
 
-	.tab:hover {
+	.tab[aria-selected='true'] {
 		color: var(--fg);
+	}
+
+	/* Gated on `(hover: hover)` like the rest — see the note in layout.css. Ties with
+	   the selected rule above at equal specificity, and both land on var(--fg), so
+	   the order of the two doesn't matter: hovering the current tab is a no-op, and
+	   hovering any other brings it up to the colour the current one already wears. */
+	@media (hover: hover) {
+		.tab:hover {
+			color: var(--fg);
+		}
 	}
 
 	/* Every label sits on a hairline; the active one draws its segments over it. */

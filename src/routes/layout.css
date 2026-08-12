@@ -113,6 +113,23 @@ button:disabled,
 	cursor: not-allowed;
 }
 
+/* ── Hover ───────────────────────────────────────────────────────────────────
+   Every hover response on this page is wrapped in `@media (hover: hover)`, here
+   and in the components. None of them carry meaning on their own — hover only
+   ever restates something the layout has already said — so withholding them
+   costs a touch device nothing.
+
+   A finger has no pointer to leave with. The browser reports the tap as a hover
+   and then holds it: the card stays lifted, the link stays underlined, the tab
+   stays lit, until something elsewhere is tapped. What a phone gets is therefore
+   not a hover effect that ends but one stuck to the last thing touched, which
+   reads as a selection nobody made.
+
+   `:active` stays outside the gate throughout, and is what a finger gets instead:
+   it lands and it lets go, which is the one part of this that a tap can actually
+   express. Tailwind v4 already gates its own `hover:` variant the same way, so
+   the utilities and the rules below behave alike rather than diverging. */
+
 /* The shared control response, and the whole of it: every button on the page
    grows toward the pointer by the same amount and gives way under it by the same
    amount, whatever else it does with colour. One number for both, because a row
@@ -137,11 +154,14 @@ button:disabled,
 	transition: scale 0.35s var(--ease-hover);
 }
 
-.press:hover {
-	scale: 1.06;
+@media (hover: hover) {
+	.press:hover {
+		scale: 1.06;
+	}
 }
 
-/* after :hover — the two match at the same specificity */
+/* after :hover — the two match at the same specificity, and a media query adds
+   none, so this still wins on source order */
 .press:active {
 	transition-duration: 0.14s;
 	transition-timing-function: var(--ease);
@@ -162,8 +182,10 @@ button:disabled,
 		scale 0.35s var(--ease-hover);
 }
 
-.cta:hover {
-	opacity: 0.88;
+@media (hover: hover) {
+	.cta:hover {
+		opacity: 0.88;
+	}
 }
 
 /* ── Pointer glow ────────────────────────────────────────────────────────────
@@ -221,9 +243,17 @@ button:disabled,
 		opacity 0.6s var(--ease-hover);
 }
 
-.glow-field:hover .glow::before {
-	opacity: 1;
-	transition-duration: var(--glow-track, 0.22s), var(--glow-track, 0.22s), 0.35s;
+/* Gated on `(pointer: fine)` rather than `(hover: hover)` — the same test
+   `glowField` makes before it binds anything. The two halves have to agree: this
+   rule only fades the light in, and the action is what puts it under the cursor,
+   so on any device where the action bails the light would come up at --gx/--gy's
+   initial 50% 50% — a bloom in the dead centre of every card in the row, lit by a
+   tap and left there. */
+@media (pointer: fine) {
+	.glow-field:hover .glow::before {
+		opacity: 1;
+		transition-duration: var(--glow-track, 0.22s), var(--glow-track, 0.22s), 0.35s;
+	}
 }
 
 /* ── Type ────────────────────────────────────────────────────────────────── */
@@ -362,9 +392,17 @@ button:disabled,
 	transition: transform 0.4s var(--ease);
 }
 
-.ul:hover::after,
+/* Split from the hover below rather than sharing a selector list: keyboard focus
+   is the one way a touch device can still reach this state, and it should keep
+   drawing the rule when it does. */
 .ul:focus-visible::after {
 	transform: scaleX(1);
+}
+
+@media (hover: hover) {
+	.ul:hover::after {
+		transform: scaleX(1);
+	}
 }
 
 .no-scrollbar {

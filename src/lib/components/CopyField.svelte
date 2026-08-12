@@ -130,12 +130,20 @@ async function copy() {
 
 	/* A shadow would be the obvious hover cue, but the button sits above its field
 	   in light and below it in dark, so only a shift toward the foreground reads
-	   as "raised" in both. */
-	.copy:hover {
-		background: color-mix(in srgb, var(--fg) 9%, var(--bg));
+	   as "raised" in both.
+
+	   Gated on `(hover: hover)` as everywhere else — see the note in layout.css.
+	   This is the one place the stuck state would actively mislead: the grey would
+	   sit under the tap that copied, next to a button whose whole job is to report
+	   what just happened. */
+	@media (hover: hover) {
+		.copy:hover {
+			background: color-mix(in srgb, var(--fg) 9%, var(--bg));
+		}
 	}
 
-	/* After :hover, so a second copy attempt doesn't lift the confirmation away. */
+	/* After :hover, so a second copy attempt doesn't lift the confirmation away —
+	   a media query adds no specificity, so source order still decides. */
 	.copy.copied {
 		background: var(--color-accent);
 		color: var(--color-paper);

@@ -86,10 +86,15 @@ $effect(() => {
 			border-color 0.5s var(--ease-hover);
 	}
 
-	.card:hover {
-		translate: 0 -3px;
-		scale: 1.02;
-		border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+	/* `(hover: hover)` as everywhere else — see the note in layout.css. These tiles
+	   are links, so on a phone the pose would stick from the tap until the page
+	   navigated away under it. */
+	@media (hover: hover) {
+		.card:hover {
+			translate: 0 -3px;
+			scale: 1.02;
+			border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {

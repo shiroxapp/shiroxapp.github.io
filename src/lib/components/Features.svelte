@@ -66,11 +66,17 @@ import RevealHeading from './RevealHeading.svelte';
 	}
 
 	/* Rises and grows together: one gesture, the card coming toward the pointer.
-	   The growth stays inside the grid gap, so neighbours never get clipped. */
-	.card:hover {
-		translate: 0 -3px;
-		scale: 1.02;
-		border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+	   The growth stays inside the grid gap, so neighbours never get clipped.
+
+	   Gated on `(hover: hover)`, as every hover on the page is — see the note in
+	   layout.css. A tapped card would otherwise hold this pose, accent border and
+	   all, long after the finger left. */
+	@media (hover: hover) {
+		.card:hover {
+			translate: 0 -3px;
+			scale: 1.02;
+			border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+		}
 	}
 
 	/* The rest of the hover is the pointer glow — `.glow` in layout.css. */

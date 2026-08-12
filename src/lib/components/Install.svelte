@@ -235,11 +235,14 @@ const split = $derived(focusApp === 0 ? [100, 100] : focusApp === 1 ? [0, 0] : [
 			border-color 0.5s var(--ease-hover);
 	}
 
-	/* Rises and grows together: one gesture, the card coming toward the pointer. */
-	.card:hover {
-		translate: 0 -3px;
-		scale: var(--grow, 1.02);
-		border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+	/* Rises and grows together: one gesture, the card coming toward the pointer.
+	   Gated like every other hover here — see the note in layout.css. */
+	@media (hover: hover) {
+		.card:hover {
+			translate: 0 -3px;
+			scale: var(--grow, 1.02);
+			border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+		}
 	}
 
 	/* The recommended panel is twice the width of the cards below it, so the same

@@ -60,9 +60,14 @@ const dark = $derived(theme.current === 'dark');
 			scale 0.35s var(--ease-hover);
 	}
 
-	.toggle:hover {
-		color: var(--fg);
-		background: var(--sunken);
+	/* `(hover: hover)` as everywhere else — see the note in layout.css. Left
+	   ungated, the toggle would keep the lit background after the tap that
+	   switched the theme, reading as a pressed state that never released. */
+	@media (hover: hover) {
+		.toggle:hover {
+			color: var(--fg);
+			background: var(--sunken);
+		}
 	}
 
 	/* transform-box keeps the origin on each shape rather than the whole canvas,

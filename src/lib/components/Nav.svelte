@@ -105,8 +105,14 @@ import ThemeToggle from './ThemeToggle.svelte';
 			scale 0.35s var(--ease-hover);
 	}
 
-	.link:hover {
-		color: var(--fg) !important;
-		background: var(--sunken);
+	/* `!important` to outrank the inline `color` the markup sets on these links,
+	   which no selector can otherwise beat. Gated on `(hover: hover)` like the rest
+	   — see the note in layout.css — so a tapped link doesn't keep the lit pill and
+	   read as the current section on the way to somewhere else. */
+	@media (hover: hover) {
+		.link:hover {
+			color: var(--fg) !important;
+			background: var(--sunken);
+		}
 	}
 </style>
