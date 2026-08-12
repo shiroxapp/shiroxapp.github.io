@@ -7,6 +7,7 @@ import Nav from '$lib/components/Nav.svelte';
 import Showcase from '$lib/components/Showcase.svelte';
 import SideRays from '$lib/components/SideRays.svelte';
 import Stats from '$lib/components/Stats.svelte';
+import config from '$lib/config.json';
 import { theme } from '$lib/theme.svelte';
 
 const title = 'Shirox — Anime & manga library manager for iOS';
@@ -16,7 +17,7 @@ const description =
 /** Served from the root of shiroxapp.github.io — see .github/workflows/pages.yml —
 	    so this is also what Cloudflare serves; both hosts share one build. Absolute,
 	    since og:image and og:url have to be, not relative to whatever crawled them. */
-const SITE_URL = 'https://shiroxapp.github.io';
+const SITE_URL = config.site.url;
 const ogImage = `${SITE_URL}/og-image.png`;
 
 /** White-on-dark barely needs help; the same rays on paper read as almost
