@@ -2,8 +2,8 @@
 // Do not edit by hand — run `bun run sync:release` instead.
 
 export const release = {
-	version: '1.0.3',
+	version: '1.0.6',
 	minOS: 'iOS 15+',
-	size: '~9 MB',
-	ipaUrl: 'https://github.com/xibrox/Shirox/releases/download/beta/Shirox.ipa',
+	size: '~25 MB',
+	ipaUrl: 'https://github.com/xibrox/Shirox/releases/download/latest/Shirox.ipa',
 } as const;

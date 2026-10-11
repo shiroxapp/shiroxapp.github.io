@@ -98,7 +98,7 @@ export const release = {
 	version: '${fields.version}',
 	minOS: '${fields.minOS}',
 	size: '${fields.size}',
-	ipaUrl: '${fields.ipaUrl}'
+	ipaUrl: '${fields.ipaUrl}',
 } as const;
 `;
 }

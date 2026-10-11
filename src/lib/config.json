@@ -19,8 +19,11 @@
 		"url": "https://ko-fi.com/xibrox"
 	},
 	"testflight": {
-		"installs": 256,
+		"installs": 1226,
 		"url": "https://testflight.apple.com/join/jvGzcXYh"
+	},
+	"macos": {
+		"dmgUrl": "https://github.com/xibrox/Shirox/releases/download/latest/Shirox-macOS.dmg"
 	},
 	"nightly": {
 		"url": "https://nightly.link/xibrox/Shirox/workflows/nightly.yaml/main?preview"
