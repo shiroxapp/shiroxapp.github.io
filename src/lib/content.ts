@@ -76,7 +76,7 @@ export type InstallMethod = {
 export const sections = {
 	features: { title: 'What it does.', sub: 'No accounts required, no ads, no upsell.' },
 	stats: { title: 'By the numbers.', sub: 'Live from GitHub, Discord and more.' },
-	install: { title: 'Install it.', sub: 'Sideload it today. On the App Store soon.' },
+	install: { title: 'Install it.', sub: 'Join the TestFlight beta, or sideload it today.' },
 } as const;
 
 export type StatKey =
@@ -114,8 +114,8 @@ export const footer = {
 export const hero = {
 	headline: 'Your anime library,',
 	headlineAccent: 'entirely yours.',
-	sub: 'A free, source-available library manager for anime and manga on iOS.',
-	meta: `v${release.version} · ${release.minOS}`,
+	sub: 'A free, source-available library manager for anime and manga on iPhone, iPad and Mac.',
+	meta: `v${release.version} · ${release.minOS} · ${release.macMinOS}`,
 } as const;
 
 export const features: Feature[] = [
@@ -284,7 +284,7 @@ export const installMethods: InstallMethod[] = [
 		url: config.testflight.url,
 		recommended: true,
 		action: 'Join the beta',
-		meta: '~21 MB · iOS 15+',
+		meta: `${release.size} · ${release.minOS}`,
 		icon: '/icons/testflight.jpg',
 	},
 	{
@@ -317,9 +317,9 @@ export const installMethods: InstallMethod[] = [
 		kind: 'download',
 		title: 'macOS DMG',
 		tagline: 'The native Mac app.',
-		url: config.macos.dmgUrl,
+		url: release.dmgUrl,
 		action: 'Download',
-		meta: '~52 MB · macOS 14+',
+		meta: `${release.macSize} · ${release.macMinOS}`,
 		icon: '/icons/github.jpg',
 	},
 	{

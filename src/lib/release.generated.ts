@@ -6,4 +6,7 @@ export const release = {
 	minOS: 'iOS 15+',
 	size: '~25 MB',
 	ipaUrl: 'https://github.com/xibrox/Shirox/releases/download/latest/Shirox.ipa',
+	macMinOS: 'macOS 14+',
+	macSize: '~52 MB',
+	dmgUrl: 'https://github.com/xibrox/Shirox/releases/download/latest/Shirox-macOS.dmg',
 } as const;

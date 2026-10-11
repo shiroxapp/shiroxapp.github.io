@@ -23,7 +23,8 @@
 		"url": "https://testflight.apple.com/join/jvGzcXYh"
 	},
 	"macos": {
-		"dmgUrl": "https://github.com/xibrox/Shirox/releases/download/latest/Shirox-macOS.dmg"
+		"dmgAsset": "Shirox-macOS.dmg",
+		"minOS": "14"
 	},
 	"nightly": {
 		"url": "https://nightly.link/xibrox/Shirox/workflows/nightly.yaml/main?preview"

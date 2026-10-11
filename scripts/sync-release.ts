@@ -1,7 +1,9 @@
 #!/usr/bin/env bun
 /**
  * Pulls the release facts the site displays out of the AltStore source manifest,
- * so cutting a release is the only step — no matching hand edit here.
+ * plus the macOS DMG from the same GitHub release the IPA ships in (the manifest
+ * only knows about the IPA), so cutting a release is the only step — no
+ * matching hand edit here.
  *
  * Writes `src/lib/release.generated.ts`, which is committed. Runs automatically
  * before `bun run build`; on its own via `bun run sync:release`.
@@ -69,6 +71,34 @@ function formatMinOS(version: string) {
 	return `iOS ${version.replace(/(\.0+)+$/, '')}+`;
 }
 
+type ReleaseAsset = {
+	name: string;
+	size: number;
+	browser_download_url: string;
+};
+
+/** The IPA's download URL names its release tag; the DMG is read from that same
+    release so the two can never drift apart by a version. */
+async function fetchMacDmg(ipaUrl: string) {
+	const tag = ipaUrl.match(/\/releases\/download\/([^/]+)\//)?.[1];
+	if (!tag) throw new Error(`cannot find a release tag in ${ipaUrl}`);
+
+	const token = process.env.GITHUB_TOKEN;
+	const response = await fetch(`${config.github.apiRepoUrl}/releases/tags/${tag}`, {
+		signal: AbortSignal.timeout(15_000),
+		headers: {
+			accept: 'application/vnd.github+json',
+			...(token ? { authorization: `Bearer ${token}` } : {}),
+		},
+	});
+	if (!response.ok) throw new Error(`release ${tag}: ${response.status} ${response.statusText}`);
+
+	const { assets } = (await response.json()) as { assets: ReleaseAsset[] };
+	const dmg = assets?.find((asset) => asset.name === config.macos.dmgAsset);
+	if (!dmg) throw new Error(`release ${tag} has no ${config.macos.dmgAsset}`);
+	return dmg;
+}
+
 function pickApp(manifest: Manifest) {
 	const featured = manifest.featuredApps?.[0];
 	const app = manifest.apps?.find((a) => a.bundleIdentifier === featured) ?? manifest.apps?.[0];
@@ -77,12 +107,15 @@ function pickApp(manifest: Manifest) {
 	return app;
 }
 
-function render(latest: ManifestVersion) {
+function render(latest: ManifestVersion, dmg: ReleaseAsset) {
 	const fields = {
 		version: latest.version,
 		minOS: formatMinOS(latest.minOSVersion),
 		size: formatSize(latest.size),
 		ipaUrl: latest.downloadURL,
+		macMinOS: `macOS ${config.macos.minOS}+`,
+		macSize: formatSize(dmg.size),
+		dmgUrl: dmg.browser_download_url,
 	};
 
 	for (const [key, value] of Object.entries(fields)) {
@@ -99,6 +132,9 @@ export const release = {
 	minOS: '${fields.minOS}',
 	size: '${fields.size}',
 	ipaUrl: '${fields.ipaUrl}',
+	macMinOS: '${fields.macMinOS}',
+	macSize: '${fields.macSize}',
+	dmgUrl: '${fields.dmgUrl}',
 } as const;
 `;
 }
@@ -112,7 +148,7 @@ async function main() {
 	if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
 
 	const latest = newest(pickApp((await response.json()) as Manifest).versions);
-	const next = render(latest);
+	const next = render(latest, await fetchMacDmg(latest.downloadURL));
 	const current = await Bun.file(OUT)
 		.text()
 		.catch(() => '');

@@ -10,9 +10,9 @@ import Stats from '$lib/components/Stats.svelte';
 import config from '$lib/config.json';
 import { theme } from '$lib/theme.svelte';
 
-const title = 'Shirox — Anime & manga library manager for iOS';
+const title = 'Shirox — Anime & manga library manager for iOS and Mac';
 const description =
-	'A free, source-available library manager for anime and manga on iOS 15+. Community modules, AniList and MyAnimeList sync, and offline downloads.';
+	'A free, source-available library manager for anime and manga on iPhone, iPad and Mac. Community modules, AniList and MyAnimeList sync, and offline downloads.';
 
 /** Served from the root of shiroxapp.github.io — see .github/workflows/pages.yml —
 	    so this is also what Cloudflare serves; both hosts share one build. Absolute,
@@ -52,7 +52,7 @@ const rayFalloff = $derived((theme.current === 'light' ? 1.3 : 1.6) + (narrow ? 
 <svelte:head>
 	<title>{title}</title>
 	<meta name="description" content={description} />
-	<meta name="keywords" content="anime, manga, library manager, iOS, AltStore, SideStore, AniList, MyAnimeList" />
+	<meta name="keywords" content="anime, manga, library manager, iOS, macOS, Mac, AltStore, SideStore, AniList, MyAnimeList" />
 	<meta name="author" content="xibrox" />
 	<link rel="canonical" href={SITE_URL} />
 
