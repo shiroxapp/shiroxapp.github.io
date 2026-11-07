@@ -1,5 +1,10 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/forms';
+/* Class strategy: the site has one input (the icon browser's search), styled by
+   hand. The default base strategy restyles every form control globally and ships
+   ::-webkit-datetime-edit selectors Firefox rejects as bad rulesets. */
+@plugin '@tailwindcss/forms' {
+	strategy: 'class';
+}
 @plugin '@tailwindcss/typography';
 
 @theme {
@@ -405,12 +410,11 @@ button:disabled,
 	}
 }
 
+/* `scrollbar-width` alone: every engine this site targets supports it now
+   (Safari since 18.2), and the old `::-webkit-scrollbar` fallback is a selector
+   Firefox rejects, logging a "Ruleset ignored" warning on every page load. */
 .no-scrollbar {
 	scrollbar-width: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-	display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

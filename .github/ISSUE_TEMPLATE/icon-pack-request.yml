@@ -1,0 +1,44 @@
+name: Icon pack request
+description: Ask for an icon set to be turned into a Shirox icon pack.
+title: "Icon pack: "
+labels: ["icon pack"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Packs are listed on https://shiroxapp.github.io/iconpacks. Want to build it yourself? The guide is on the same page, under "Make your own".
+  - type: input
+    id: name
+    attributes:
+      label: Icon set
+      description: The name of the icon set.
+      placeholder: Phosphor
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Website
+      description: Where the icons are published.
+      placeholder: https://phosphoricons.com
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: License
+      description: Packs are only possible for icon sets whose license allows redistribution (MIT, ISC, CC BY, ...).
+      placeholder: MIT
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: A style or weight you want (outline, filled, duotone), or a link to a preview.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to build this pack myself.
