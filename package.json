@@ -7,6 +7,7 @@
 		"dev": "vite dev",
 		"sync:release": "bun scripts/sync-release.ts",
 		"probe": "bun scripts/probe.ts",
+		"iconpacks": "bun scripts/iconpacks.ts",
 		"prebuild": "bun run sync:release",
 		"build": "vite build",
 		"postbuild": "bun scripts/minify-html.ts",

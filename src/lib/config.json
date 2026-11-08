@@ -34,5 +34,11 @@
 	},
 	"sidestore": {
 		"url": "sidestore://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fxibrox%2FShirox%2Frefs%2Fheads%2Fmain%2Fapps.json"
+	},
+	"iconpacks": {
+		"repoUrl": "https://github.com/shiroxapp/shiroxapp.github.io",
+		"treeUrl": "https://github.com/shiroxapp/shiroxapp.github.io/tree/main/static/iconpacks",
+		"requestUrl": "https://github.com/shiroxapp/shiroxapp.github.io/issues/new?template=icon-pack-request.yml",
+		"manifestUrl": "https://raw.githubusercontent.com/xibrox/Shirox/main/iconpacks/icons.json"
 	}
 }
