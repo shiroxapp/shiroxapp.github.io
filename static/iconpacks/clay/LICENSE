@@ -1,6 +1,6 @@
 with icons Clay by Evergrow (https://github.com/withevergrow/withicons)
 Taken from @iconify-json/withicons-clay 1.2.0; icons picked for the SF Symbols Shirox uses
-(see "sources" in pack.json), saved as SVG and converted to PDF.
+(see "sources" in pack.json), cropped to their drawn area, saved as SVG and converted to PDF.
 
 --------------------------------------------------------------------------------
 

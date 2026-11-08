@@ -49,7 +49,7 @@ const steps = [
 	{
 		title: 'Build and check',
 		body: 'Turns the SVGs into the PDFs the app draws, and checks nothing is missing. Needs rsvg-convert (brew install librsvg).',
-		code: 'bun run iconpacks build my-icons\nbun run iconpacks check my-icons\nbun run dev   # see it on /iconpacks',
+		code: 'bun run iconpacks trim my-icons    # optional: crops empty margins\nbun run iconpacks build my-icons\nbun run iconpacks check my-icons\nbun run dev   # see it on /iconpacks',
 	},
 	{
 		title: 'Open a pull request',
