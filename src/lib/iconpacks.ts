@@ -14,6 +14,9 @@ export type IconPackSummary = {
 	/** The folder name under /static/iconpacks, e.g. `lucide`. */
 	id: string;
 	name: string;
+	/** Who drew the icons, and their license without the version note, for the credit line. */
+	author: string;
+	license: string;
 	website: string;
 	contributor: { name: string; url: string } | null;
 	/** The link pasted into the app: where this pack's pack.json is published. */
@@ -62,3 +65,8 @@ export const glyphUrl = (pack: string, icon: string) => `/iconpacks/${pack}/svg/
 
 /** A pack's folder on GitHub. */
 export const packSourceUrl = (treeUrl: string, pack: string) => `${treeUrl}/${pack}`;
+
+/** A pack's LICENSE on GitHub: served from the site, an extensionless file downloads
+    instead of opening. */
+export const packLicenseUrl = (treeUrl: string, pack: string) =>
+	`${treeUrl.replace('/tree/', '/blob/')}/${pack}/LICENSE`;

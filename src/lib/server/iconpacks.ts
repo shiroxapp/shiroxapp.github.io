@@ -2,6 +2,8 @@ import type { IconPackSummary } from '$lib/iconpacks';
 
 type PackFile = {
 	name: string;
+	author?: string;
+	license?: string;
 	website?: string;
 	contributor?: { name: string; url: string };
 	url: string;
@@ -21,6 +23,9 @@ export const iconPacks: IconPackSummary[] = Object.entries(files)
 	.map(([path, pack]) => ({
 		id: path.split('/').at(-2) ?? '',
 		name: pack.name,
+		author: pack.author ?? '',
+		// "CC BY 4.0 (Font Awesome Free 7.3.1)" -> "CC BY 4.0"
+		license: (pack.license ?? '').replace(/\s*\(.*\)\s*$/, ''),
 		website: pack.website ?? '',
 		contributor: pack.contributor ?? null,
 		url: pack.url,

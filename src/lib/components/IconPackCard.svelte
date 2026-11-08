@@ -1,6 +1,6 @@
 <script lang="ts">
 import config from '$lib/config.json';
-import { type IconPackSummary, packSourceUrl } from '$lib/iconpacks';
+import { type IconPackSummary, packLicenseUrl, packSourceUrl } from '$lib/iconpacks';
 import { preconnectOnHover } from '$lib/motion';
 import CopyField from './CopyField.svelte';
 import IconPreview from './IconPreview.svelte';
@@ -16,9 +16,27 @@ let { pack }: { pack: IconPackSummary } = $props();
 
 	<div class="flex flex-1 flex-col gap-5 p-6 sm:p-7">
 		<div class="flex flex-wrap items-center justify-between gap-3">
-			<div class="flex items-baseline gap-2.5">
-				<h3 class="text-[1.375rem] font-medium tracking-tight">{pack.name}</h3>
-				<span class="mono text-[0.75rem]" style="color: var(--muted);">v{pack.packVersion}</span>
+			<div>
+				<div class="flex items-baseline gap-2.5">
+					<h3 class="text-[1.375rem] font-medium tracking-tight">{pack.name}</h3>
+					<span class="mono text-[0.75rem]" style="color: var(--muted);">v{pack.packVersion}</span>
+				</div>
+				<!-- Credit to whoever drew the icons, with their license: the pack is theirs,
+				     the contributor only put it together for Shirox. -->
+				{#if pack.author}
+					<p class="mt-0.5 text-[0.75rem]" style="color: var(--muted);">
+						Icons by
+						{#if pack.website}
+							<a href={pack.website} target="_blank" rel="noreferrer" class="ul">{pack.author}</a>
+						{:else}
+							{pack.author}
+						{/if}
+						{#if pack.license}
+							·
+							<a href={packLicenseUrl(config.iconpacks.treeUrl, pack.id)} target="_blank" rel="noreferrer" class="ul">{pack.license}</a>
+						{/if}
+					</p>
+				{/if}
 			</div>
 
 			{#if pack.contributor}
