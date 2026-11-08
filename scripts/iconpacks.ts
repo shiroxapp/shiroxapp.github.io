@@ -2,7 +2,7 @@
 /**
  * Builds and checks the icon packs in static/iconpacks.
  *
- *     bun run iconpacks check               # every pack against the app's icons.json
+ *     bun run iconpacks check [pack]        # every pack (or one) against the app's icons.json
  *     bun run iconpacks build <pack> [ver]  # svg/*.svg -> icons/*.pdf, rewrites pack.json
  *
  * icons.json, the list of SF Symbols a pack has to cover and its version, belongs
@@ -59,10 +59,12 @@ async function packIds(): Promise<string[]> {
 		.sort();
 }
 
-async function check() {
+async function check(only: string | undefined) {
+	const ids = await packIds();
+	if (only && !ids.includes(only)) throw new Error(`no pack ${only} in static/iconpacks`);
 	const { version, icons } = await manifest();
 	let failed = false;
-	for (const id of await packIds()) {
+	for (const id of only ? [only] : ids) {
 		const pack = await readPack(id);
 		const problems: string[] = [];
 		if (!pack.name) problems.push('no name');
@@ -131,10 +133,10 @@ async function build(id: string | undefined, forced: string | undefined) {
 
 const [command, ...args] = process.argv.slice(2);
 try {
-	if (command === 'check') await check();
+	if (command === 'check') await check(args[0]);
 	else if (command === 'build') await build(args[0], args[1]);
 	else {
-		console.log('usage: bun run iconpacks check | build <pack> [packVersion]');
+		console.log('usage: bun run iconpacks check [pack] | build <pack> [packVersion]');
 		process.exit(2);
 	}
 } catch (error) {

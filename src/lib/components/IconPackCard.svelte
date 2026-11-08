@@ -11,7 +11,7 @@ let { pack }: { pack: IconPackSummary } = $props();
 <!-- `id` so the home page's pack cards can land on this one. -->
 <article id={pack.id} class="card glow relative flex flex-col overflow-hidden rounded-2xl">
 	<div class="preview relative px-6 pt-6 pb-5 sm:px-7">
-		<IconPreview pack={pack.id} />
+		<IconPreview pack={pack.id} multicolor={pack.multicolor} />
 	</div>
 
 	<div class="flex flex-1 flex-col gap-5 p-6 sm:p-7">

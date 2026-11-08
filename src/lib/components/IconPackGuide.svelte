@@ -2,6 +2,7 @@
 import config from '$lib/config.json';
 import { iconPacksCopy } from '$lib/content';
 import { inView, inViewStagger } from '$lib/motion';
+import IconPackChecker from './IconPackChecker.svelte';
 import RevealHeading from './RevealHeading.svelte';
 
 /**
@@ -36,19 +37,19 @@ const steps = [
 	},
 	{
 		title: 'Draw one SVG per symbol',
-		body: 'Name each file after the SF Symbol it replaces, e.g. house.fill.svg. Paint in currentColor so the app can tint it.',
+		body: 'Name each file after the SF Symbol it replaces, e.g. house.fill.svg. Paint in currentColor so the app can tint it. The checker below shows what is still missing.',
 		code: 'static/iconpacks/my-icons/svg/house.fill.svg\nstatic/iconpacks/my-icons/svg/magnifyingglass.svg\n…',
 		link: { label: 'The list of symbols (icons.json)', href: config.iconpacks.manifestUrl },
 	},
 	{
 		title: 'Describe the pack',
-		body: 'Add a pack.json beside the svg folder. Leave icons empty, the build fills it in. Put a LICENSE file next to it too.',
+		body: 'Add a pack.json beside the svg folder. Leave icons empty, the build fills it in. Put a LICENSE file next to it too. For a pack drawn in colour, add "multicolor": true so the app keeps the colours.',
 		code: packJson,
 	},
 	{
 		title: 'Build and check',
 		body: 'Turns the SVGs into the PDFs the app draws, and checks nothing is missing. Needs rsvg-convert (brew install librsvg).',
-		code: 'bun run iconpacks build my-icons\nbun run iconpacks check\nbun run dev   # see it on /iconpacks',
+		code: 'bun run iconpacks build my-icons\nbun run iconpacks check my-icons\nbun run dev   # see it on /iconpacks',
 	},
 	{
 		title: 'Open a pull request',
@@ -94,6 +95,10 @@ const steps = [
 			</li>
 		{/each}
 	</ol>
+
+	<div use:inView class="mt-4">
+		<IconPackChecker />
+	</div>
 </section>
 
 <style>

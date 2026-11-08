@@ -9,7 +9,11 @@ import IconGlyph from './IconGlyph.svelte';
  * set on the shared clock, one slot after another, so every card on the page
  * shows the same symbols at the same moment and can be compared at a glance.
  */
-let { pack, count = 8 }: { pack: string; count?: number } = $props();
+let {
+	pack,
+	count = 8,
+	multicolor = false,
+}: { pack: string; count?: number; multicolor?: boolean } = $props();
 
 const slots = $derived(
 	Array.from(
@@ -48,7 +52,7 @@ function leave(_: Element, { delay = 0 }: { delay?: number }) {
 		<div class="slot grid place-items-center">
 			{#key icon}
 				<span class="cell" in:enter={{ delay: i * 55 }} out:leave={{ delay: i * 35 }}>
-					<IconGlyph {pack} {icon} class="h-7 w-7 sm:h-8 sm:w-8" />
+					<IconGlyph {pack} {icon} color={multicolor} class="h-7 w-7 sm:h-8 sm:w-8" />
 				</span>
 			{/key}
 		</div>

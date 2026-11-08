@@ -6,6 +6,8 @@ type PackFile = {
 	contributor?: { name: string; url: string };
 	url: string;
 	packVersion: number;
+	featured?: boolean;
+	multicolor?: boolean;
 };
 
 /* Eager and server-only: the packs are read once at build time, while the pages
@@ -23,5 +25,8 @@ export const iconPacks: IconPackSummary[] = Object.entries(files)
 		contributor: pack.contributor ?? null,
 		url: pack.url,
 		packVersion: pack.packVersion,
+		featured: pack.featured !== false,
+		multicolor: pack.multicolor === true,
 	}))
-	.sort((a, b) => a.name.localeCompare(b.name));
+	// The regular packs first, then the just-for-fun ones, each by name.
+	.sort((a, b) => Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name));

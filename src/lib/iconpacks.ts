@@ -19,6 +19,11 @@ export type IconPackSummary = {
 	/** The link pasted into the app: where this pack's pack.json is published. */
 	url: string;
 	packVersion: number;
+	/** False for the just-for-fun packs, which the icon page lists but the home page
+	    leaves out. Site-only: `featured` in pack.json, which the app ignores. */
+	featured: boolean;
+	/** Drawn in its own colours (`multicolor` in pack.json): previewed as images, not tinted. */
+	multicolor: boolean;
 };
 
 /**

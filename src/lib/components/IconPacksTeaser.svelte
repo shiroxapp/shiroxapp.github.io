@@ -35,14 +35,15 @@ const copy = iconPacksCopy.teaser;
 	</p>
 
 	<div
-		class="glow-field mt-12 grid grid-cols-2 gap-4 md:mt-16 md:grid-cols-5"
+		class="glow-field mt-12 grid grid-cols-2 gap-4 md:mt-16 md:grid-cols-[repeat(var(--cols),minmax(0,1fr))]"
+		style="--cols: {packs.length + 1};"
 		use:inViewStagger={70}
 		use:glowField
 	>
 		{#each packs as pack (pack.id)}
 			<a href="/iconpacks/#{pack.id}" class="card glow relative overflow-hidden rounded-2xl p-6">
-				<IconPreview pack={pack.id} count={4} />
-				<p class="mt-5 text-center text-[0.8125rem] text-nowrap" style="color: var(--muted);">
+				<IconPreview pack={pack.id} count={4} multicolor={pack.multicolor} />
+				<p class="mt-5 text-center text-[0.8125rem] leading-snug text-balance" style="color: var(--muted);">
 					{pack.name}
 				</p>
 			</a>
@@ -50,14 +51,15 @@ const copy = iconPacksCopy.teaser;
 
 		<a
 			href="/iconpacks/#create"
-			class="card own glow relative col-span-2 flex flex-col items-center justify-center overflow-hidden rounded-2xl p-6 md:col-span-1"
+			class="card own glow relative flex flex-col items-center justify-center overflow-hidden rounded-2xl p-6 md:col-span-1"
+			class:col-span-2={packs.length % 2 === 0}
 		>
 			<span class="plus grid h-14 w-14 place-items-center rounded-full" aria-hidden="true">
 				<svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
 					<path d="M10 3v14M3 10h14" stroke-linecap="round" />
 				</svg>
 			</span>
-			<p class="mt-5 text-center text-[0.8125rem] text-nowrap" style="color: var(--muted);">
+			<p class="mt-5 text-center text-[0.8125rem] leading-snug text-balance" style="color: var(--muted);">
 				{copy.own}
 			</p>
 		</a>
