@@ -332,3 +332,42 @@ export const installMethods: InstallMethod[] = [
 		icon: '/icons/github.jpg',
 	},
 ];
+
+/** The icon packs page (/iconpacks) and its teaser on the home page. */
+export const iconPacksCopy = {
+	teaser: {
+		title: 'Make it yours.',
+		sub: 'Swap every icon in the app for a community pack.',
+		cta: 'All icon packs',
+		own: 'Build your own',
+	},
+	hero: {
+		kicker: 'Icon packs',
+		headline: 'Every icon,',
+		headlineAccent: 'your style.',
+		sub: 'Redraw every button, tab and row in Shirox with a pack from the community. Free, open, and one link away.',
+	},
+	packs: {
+		title: 'The packs.',
+		sub: 'Copy a link, paste it in the app. That is the whole install.',
+	},
+	install: {
+		title: 'Install one.',
+		steps: [
+			{ title: 'Copy the link', body: 'Every pack has one, right on its card.' },
+			{ title: 'Open Icon Packs', body: 'Settings › General › Icon Packs in Shirox.' },
+			{ title: 'Paste and pick', body: 'Add Icon Pack, then tap it to use it.' },
+		],
+		note: 'Packs update themselves from the same link. SF Symbols is always one tap away.',
+	},
+	create: {
+		title: 'Make your own.',
+		sub: 'A pack is a folder of SVGs and one JSON file. No design tools required beyond an icon set you like.',
+	},
+	request: {
+		title: 'Missing one?',
+		sub: 'Ask for the icon set you want, or send the pack yourself.',
+		cta: 'Request a pack',
+		own: 'Create your own',
+	},
+} as const;

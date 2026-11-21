@@ -1,0 +1,27 @@
+# Checks every icon pack in static/iconpacks against the app's icons.json: all
+# symbols covered, every file present, the right url and icons version.
+name: Icon packs
+
+on:
+  push:
+    branches: [main]
+    paths: ["static/iconpacks/**", "scripts/iconpacks.ts"]
+  pull_request:
+    paths: ["static/iconpacks/**", "scripts/iconpacks.ts"]
+  # icons.json lives in the app repo; a weekly run notices when it moves on.
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun run iconpacks check

@@ -1,8 +1,14 @@
 <script lang="ts">
+import { page } from '$app/state';
 import { links } from '$lib/content';
 import { preconnectOnHover, scrollProgress } from '$lib/motion';
 import ShiroMark from './ShiroMark.svelte';
 import ThemeToggle from './ThemeToggle.svelte';
+
+/* The dock is shared by every page. On the home page its links scroll within it;
+   anywhere else they lead back to the home page's sections first. */
+const home = $derived(page.url.pathname === '/');
+const section = (id: string) => (home ? `#${id}` : `/#${id}`);
 </script>
 
 <!-- Scroll position, as a single hairline along the very top edge. It sits above
@@ -28,9 +34,9 @@ import ThemeToggle from './ThemeToggle.svelte';
 		style="border-color: var(--rule); background: var(--glass);"
 	>
 		<a
-			href="#top"
+			href={home ? '#top' : '/'}
 			class="group flex items-center gap-2.5 rounded-full py-2 pr-2"
-			aria-label="Shirox, back to top"
+			aria-label={home ? 'Shirox, back to top' : 'Shirox, home'}
 		>
 			<ShiroMark
 				class="h-[1.3rem] w-[1.3rem] transition-transform duration-500 group-hover:-rotate-6"
@@ -48,9 +54,16 @@ import ThemeToggle from './ThemeToggle.svelte';
 		     needs; at sm the pill closes up again and the dividers come back. -->
 		<nav aria-label="Primary" class="ml-auto flex items-center gap-1 sm:ml-0">
 			<a
-				href="#features"
+				href={section('features')}
 				class="link press hidden rounded-full px-4 py-2.5 text-[0.9375rem] sm:block"
 				style="color: var(--muted);">Features</a
+			>
+			<a
+				href="/iconpacks/"
+				class="link press rounded-full px-3 py-2.5 text-[0.9375rem] sm:px-4"
+				class:current={page.url.pathname.startsWith('/iconpacks')}
+				aria-current={page.url.pathname.startsWith('/iconpacks') ? 'page' : undefined}
+				style="color: var(--muted);">Icons</a
 			>
 			<a
 				href={links.github}
@@ -61,7 +74,7 @@ import ThemeToggle from './ThemeToggle.svelte';
 				style="color: var(--muted);">Source</a
 			>
 			<a
-				href="#install"
+				href={section('install')}
 				class="cta press rounded-full px-5 py-2.5 text-[0.9375rem] font-medium"
 				style="background: var(--color-accent); color: var(--color-paper);">Install</a
 			>
@@ -109,6 +122,10 @@ import ThemeToggle from './ThemeToggle.svelte';
 	   which no selector can otherwise beat. Gated on `(hover: hover)` like the rest
 	   — see the note in layout.css — so a tapped link doesn't keep the lit pill and
 	   read as the current section on the way to somewhere else. */
+	.link.current {
+		color: var(--fg) !important;
+	}
+
 	@media (hover: hover) {
 		.link:hover {
 			color: var(--fg) !important;
